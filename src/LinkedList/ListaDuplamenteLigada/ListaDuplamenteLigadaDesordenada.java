@@ -104,27 +104,22 @@ public class ListaDuplamenteLigadaDesordenada<X> implements Cloneable {
         }
     }
 
-        // Definição da classe No
     private No primeiro = null;
     private int tamanho = 0;
 
-    // Construtor da lista
     public ListaDuplamenteLigadaDesordenada() {
         // Implementação do construtor
     }
 
-    // Verifica se a lista está vazia
     public boolean estaVazia() {
         return primeiro == null;
     }
 
-    // Retorna o tamanho da lista
     public int tamanho() {
         return tamanho;
     }
 
-    // Insere um elemento no final da lista
-    public void inserir(X elemento) {
+    public void guarde(X elemento) {
         No novo = new No(elemento);
         if (estaVazia()) {
             primeiro = novo;
@@ -139,7 +134,29 @@ public class ListaDuplamenteLigadaDesordenada<X> implements Cloneable {
         tamanho++;
     }
 
-    // Remove um elemento da lista
+    public void guardeEm(int posicao, X info) throws Exception {
+        if (this.primeiro == null)
+            throw new Exception("Nó Vazio");
+        if (info == null)
+            throw new Exception("Informação Ausente");
+        if (posicao < 0)
+            throw new Exception("Posição inválida");
+    
+
+        No anterior = this.primeiro;
+        No atual = this.primeiro.getProx();
+        int indice = 1;
+        while (atual.getProx() != null && indice < posicao) {
+            anterior = atual;
+            atual = atual.getProx();
+            indice++;
+        }
+        if (indice < posicao)
+            throw new Exception("Posição inválida");
+
+        anterior.setProx(new No(info, atual, anterior));
+    }
+
     public void remover(X elemento) {
         No atual = primeiro;
         No anterior = null;
@@ -162,7 +179,6 @@ public class ListaDuplamenteLigadaDesordenada<X> implements Cloneable {
         }
     }
 
-    // Busca um elemento na lista
     public boolean contem(X elemento) {
         No atual = primeiro;
         while (atual != null) {
@@ -174,7 +190,6 @@ public class ListaDuplamenteLigadaDesordenada<X> implements Cloneable {
         return false;
     }
 
-    // Retorna uma representação em String da lista
     @Override
     public String toString() {
         if (estaVazia()) {
@@ -192,5 +207,21 @@ public class ListaDuplamenteLigadaDesordenada<X> implements Cloneable {
 
         // Outros métodos como clonagem, inversão, etc. podem ser adicionados conforme
         // necessário
+
+    public static void main(String[] args) throws Exception {
+        ListaDuplamenteLigadaDesordenada<Integer> lista = new ListaDuplamenteLigadaDesordenada<>();
+        lista.guarde(1);
+        lista.guarde(2);
+        lista.guarde(3);
+        lista.guarde(4);
+        lista.guarde(5);
+        System.out.println(lista);
+        System.out.println(lista.tamanho());
+        System.out.println(lista.contem(3));
+        lista.guardeEm(2, 4);
+        System.out.println(lista);
+        System.out.println(lista.tamanho());
+        System.out.println(lista.contem(3));
+    }
     
 }
