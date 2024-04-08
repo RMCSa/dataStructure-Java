@@ -1,2 +1,2 @@
-# dataStructure-Java
-Estudo de Estruturas de Dados utilizando Java.
+# Data Structure 
+Study of Data Structures using Java.
