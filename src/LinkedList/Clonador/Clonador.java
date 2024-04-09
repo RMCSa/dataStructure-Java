@@ -1,6 +1,5 @@
-package Clonador;
 
-
+package LinkedList.Clonador;
 import java.lang.reflect.*;
 
 public class Clonador<X> {

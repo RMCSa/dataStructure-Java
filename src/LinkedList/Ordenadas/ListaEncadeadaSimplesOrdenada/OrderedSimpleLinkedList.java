@@ -1,6 +1,9 @@
-package ListaEncadeadaSimples;
-
-import Clonador.Clonador;
+package LinkedList.Ordenadas.ListaEncadeadaSimplesOrdenada;
+import LinkedList.Clonador.Clonador;
+/**
+ * author: Rafael Moreira Cavalcante de Souza - 23333
+ */
+// Tava testando o inglês refazendo a lista ordenada antes do senhor pedir 
 public class OrderedSimpleLinkedList <X extends Comparable<X>> implements Cloneable{
     private class Node implements Cloneable {
         private X data;
@@ -153,14 +156,14 @@ public class OrderedSimpleLinkedList <X extends Comparable<X>> implements Clonea
         }
 
         Node atual = this.first;
-        int elementos = 0;
+        int elements = 0;
 
         while (atual != null) {
             atual = atual.getNext();
-            elementos++;
+            elements++;
         }
 
-        return elementos;
+        return elements;
     }
 
     // position poderá ser 0, 1, etc
@@ -202,14 +205,15 @@ public class OrderedSimpleLinkedList <X extends Comparable<X>> implements Clonea
             this.first = null;
             return;
         }
-
-        Node atual = this.first;
+        
+        Node anterior = this.first;
+        Node atual = this.first.getNext();
 
         while (atual.getNext() != null) {
+            anterior = atual;
             atual = atual.getNext();
         }
-
-        atual.setNext(null);
+        anterior.setNext(null);
     }
 
     public void remove(int position) throws Exception {
@@ -257,19 +261,19 @@ public class OrderedSimpleLinkedList <X extends Comparable<X>> implements Clonea
         if (obj.getClass() != this.getClass())
             return false;
 
-        Node atualDoThis = this.first;
+        Node actualThis = this.first;
         Node atualDoObj = ((OrderedSimpleLinkedList<X>) obj).first;
 
-        while (atualDoThis != null && atualDoObj != null) {
-            if (!atualDoThis.getData().equals(atualDoObj.getData())) {
+        while (actualThis != null && atualDoObj != null) {
+            if (!actualThis.getData().equals(atualDoObj.getData())) {
 
                 return false;
             }
-            atualDoThis = atualDoThis.getNext();
+            actualThis = actualThis.getNext();
             atualDoObj = atualDoObj.getNext();
         }
 
-        if (atualDoThis != null || atualDoObj != null)
+        if (actualThis != null || atualDoObj != null)
             return false;
 
         return true;
@@ -291,27 +295,27 @@ public class OrderedSimpleLinkedList <X extends Comparable<X>> implements Clonea
         return ret;
     }
 
-    public OrderedSimpleLinkedList (OrderedSimpleLinkedList<X> modelo) throws Exception
+    public OrderedSimpleLinkedList (OrderedSimpleLinkedList<X> model) throws Exception
 	{
-		if (modelo==null) throw new Exception ("Modelo ausente");
+		if (model==null) throw new Exception ("Modelo ausente");
 		
-		if (modelo.first==null)
+		if (model.first==null)
 		{
 			this.first=null;
 			return;
 		}
 		
-		this.first = new Node (modelo.first.getData());
+		this.first = new Node (model.first.getData());
 		
-		Node atualDoThis   = this.first;
-		Node atualDoModelo = modelo.first.getNext();
+		Node actualThis   = this.first;
+		Node actualModel = model.first.getNext();
 		
-		while (atualDoModelo!=null)
+		while (actualModel!=null)
 		{
-			atualDoThis.setNext (new Node (atualDoModelo.getData()));
+			actualThis.setNext (new Node (actualModel.getData()));
 			
-			atualDoThis  =atualDoThis  .getNext();
-			atualDoModelo=atualDoModelo.getNext();
+			actualThis  = actualThis  .getNext();
+			actualModel=actualModel.getNext();
 		}
 	}
 

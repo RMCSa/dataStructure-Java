@@ -1,7 +1,5 @@
-package ListaEncadeadaSimples;
-
-import Clonador.Clonador;
-
+package LinkedList.Desordenadas.ListaEncadeadaSimplesDesordenada;
+import LinkedList.Clonador.Clonador;
 /**
  * author: Rafael Moreira Cavalcante de Souza - 23333
  */
@@ -305,16 +303,16 @@ public class ListaEncadeadaSimplesDesordenada<X> implements Cloneable {
     public String toString() {
         if (this.primeiro == null)
             return "[]";
-        StringBuilder ret = new StringBuilder("[");
+        String ret = "[";
         No atual = this.primeiro;
         while (atual != null) {
-            ret.append(atual.getInfo());
+            ret += atual.getInfo();
             if (atual.getProx() != null)
-                ret.append(" -> ");
+                ret += " -> ";
             atual = atual.getProx();
         }
-        ret.append("]");
-        return ret.toString();
+        ret += "]";
+        return ret;
     }
 
     @Override
