@@ -92,6 +92,10 @@ public class ListaEncadeadaSimplesDesordenada<X> implements Cloneable {
         // TODO Auto-generated constructor stub
     }
 
+    public boolean isVazia() {
+        return this.primeiro == null;
+    }
+
     public void guardeNoInicio(X i) throws Exception {
         if (i == null)
             throw new Exception("Informação Ausente");
@@ -125,7 +129,6 @@ public class ListaEncadeadaSimplesDesordenada<X> implements Cloneable {
             guardeNoInicio(info);
             return;
         }
-
         
         No anterior = this.primeiro;
         No atual = this.primeiro.getProx();
@@ -158,8 +161,7 @@ public class ListaEncadeadaSimplesDesordenada<X> implements Cloneable {
         if (this.primeiro == null)
             throw new Exception("Nó Vazio");
 
-        X info = new Clonador<X>().clone(this.primeiro.getInfo());
-        return info;
+        return this.primeiro.getInfo();
     }
 
     public X getUltimo() throws Exception {
@@ -177,30 +179,29 @@ public class ListaEncadeadaSimplesDesordenada<X> implements Cloneable {
         return atual.getInfo();
     }
 
-    /*
-     * // Retornar o número de elementos
-     * private int getTamanho() {
-     * if (this.primeiro == null)
-     * return 0;
-     * if (this.primeiro.getProx() == null)
-     * return 1;
-     * No atual = this.primeiro;
-     * int elementos = 0;
-     * while (atual != null) {
-     * atual = atual.getProx();
-     * elementos++;
-     * }
-     * return elementos;
-     * }
-     */
+    
+      // Retornar o número de elementos
+    public int getTamanho(){
+        if (this.primeiro == null)
+            return 0;
+        if (this.primeiro.getProx() == null)
+            return 1;
+        No atual = this.primeiro;
+        int elementos = 0;
+        while (atual != null) {
+            atual = atual.getProx();
+            elementos++;
+        }
+        return elementos;
+    }
+     
     public X get(int posicao) throws Exception {
         if (this.primeiro == null)
             throw new Exception("Nó Vazio");
 
-        /*
-         * if (posicao < 0 || posicao > getTamanho() - 1)
-         * throw new Exception("Posição inválida");
-         */
+        if (posicao < 0 || posicao > getTamanho() - 1)
+            throw new Exception("Posição inválida");
+        
         if (posicao == 0) {
             return this.primeiro.getInfo();
         }
@@ -224,6 +225,7 @@ public class ListaEncadeadaSimplesDesordenada<X> implements Cloneable {
 
         if (this.primeiro.getProx() == null) {
             this.primeiro = null;
+            return;
         }
         this.primeiro = this.primeiro.getProx();
     }
@@ -252,15 +254,15 @@ public class ListaEncadeadaSimplesDesordenada<X> implements Cloneable {
             throw new Exception("Nó nulo, nada a retirar");
         if (posicao < 0)
             throw new Exception("Posição inválida");
-        /*
-         * if (posicao > getTamanho() - 1) {
-         * throw new Exception("Posição Inexistente");
-         * }
-         * if (posicao == getTamanho() - 1) {
-         * removaUltimo();
-         * return;
-         * }
-         */
+        
+        if (posicao > getTamanho() - 1) {
+            throw new Exception("Posição Inexistente");
+        }
+        if (posicao == getTamanho() - 1) {
+            removaUltimo();
+            return;
+        }
+         
         if (posicao == 0) {
             removaPrimeiro();
             return;
