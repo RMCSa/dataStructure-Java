@@ -2,7 +2,7 @@ package Pilhas;
 
 import LinkedList.Desordenadas.ListaEncadeadaSimplesDesordenada.ListaEncadeadaSimplesDesordenada;
 
-public class Pilha<X> {
+public class Pilha<X> implements Cloneable {
     private ListaEncadeadaSimplesDesordenada<X> lista;
 
     public Pilha() {
@@ -32,7 +32,7 @@ public class Pilha<X> {
     }
 
     public boolean isVazia() {
-        return lista.isVazia();
+        return lista.isVazia(); // Função q criei na ListaEncadeadaSimplesDesordenada q retorna um bool
     }
 
     @Override
@@ -46,18 +46,33 @@ public class Pilha<X> {
             return true;
         if (this.getClass() != obj.getClass() || obj == null)
             return false;
-            
+
         Pilha<X> pilha = (Pilha<X>) obj;
         if (this.lista.equals(pilha.lista))
             return true;
-            
+
         return false;
     }
 
-    @Override 
+    @Override
     public int hashCode() {
         int ret = 777;
         ret = ret * 7 + this.lista.hashCode();
+        return ret;
+    }
+
+    public Pilha(Pilha<X> modelo) throws Exception {
+        if (modelo == null)
+            throw new Exception("Modelo ausente");
+        this.lista = new ListaEncadeadaSimplesDesordenada<>(modelo.lista);
+    }
+
+    public Object clone() {
+        Pilha<X> ret = null;
+        try {
+            ret = new Pilha<>(this);
+        } catch (Exception e) {
+        }
         return ret;
     }
 }

@@ -1,7 +1,8 @@
 package Filas;
 
 import LinkedList.Desordenadas.ListaEncadeadaSimplesDesordenada.ListaEncadeadaSimplesDesordenada;
-public class Fila<X> {
+
+public class Fila<X> implements Cloneable {
     private ListaEncadeadaSimplesDesordenada<X> lista;
 
     public Fila() {
@@ -32,13 +33,13 @@ public class Fila<X> {
     }
 
     public boolean isVazia() {
-        return lista.isVazia();
+        return lista.isVazia(); // Função q criei na ListaEncadeadaSimplesDesordenada q retorna um bool
     }
 
     @Override
     public String toString() {
         return this.lista.toString();
-    }   
+    }
 
     @Override
     public boolean equals(Object obj) {
@@ -48,16 +49,34 @@ public class Fila<X> {
             return false;
 
         Fila<X> fila = (Fila<X>) obj;
-        if(this.lista.equals(fila.lista))
+        if (this.lista.equals(fila.lista))
             return true;
-            
-        return false
+
+        return false;
     }
 
     @Override
     public int hashCode() {
         int ret = 777;
         ret = ret * 7 + this.lista.hashCode();
+        return ret;
+    }
+
+    public Fila(Fila<X> modelo) throws Exception {
+        if (modelo == null)
+            throw new Exception("Modelo ausente");
+
+        this.lista = new ListaEncadeadaSimplesDesordenada<>(modelo.lista);
+    }
+
+    public Object clone() {
+        Fila<X> ret = null;
+
+        try {
+            ret = new Fila<>(this);
+        } catch (Exception e) {
+        }
+
         return ret;
     }
 }
