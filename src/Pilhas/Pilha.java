@@ -5,7 +5,7 @@ import LinkedList.Desordenadas.ListaEncadeadaSimplesDesordenada.ListaEncadeadaSi
 public class Pilha<X> {
     private ListaEncadeadaSimplesDesordenada<X> lista;
 
-    public Pilha(int capacidade) {
+    public Pilha() {
         this.lista = new ListaEncadeadaSimplesDesordenada<>();
     }
 
@@ -28,19 +28,36 @@ public class Pilha<X> {
     }
 
     public boolean isCheia() {
-        return false;
+        return false; // Listas encadeadas nãop possuem limite
     }
 
     public boolean isVazia() {
         return lista.isVazia();
     }
 
-    public int tamanho() {
-        return lista.getTamanho();
-    }
-
     @Override
     public String toString() {
         return this.lista.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (this.getClass() != obj.getClass() || obj == null)
+            return false;
+            
+        Pilha<X> pilha = (Pilha<X>) obj;
+        if (this.lista.equals(pilha.lista))
+            return true;
+            
+        return false;
+    }
+
+    @Override 
+    public int hashCode() {
+        int ret = 777;
+        ret = ret * 7 + this.lista.hashCode();
+        return ret;
     }
 }
