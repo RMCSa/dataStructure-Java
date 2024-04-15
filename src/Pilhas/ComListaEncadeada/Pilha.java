@@ -1,4 +1,4 @@
-package Pilhas;
+package Pilhas.ComListaEncadeada;
 
 import LinkedList.Desordenadas.ListaEncadeadaSimplesDesordenada.ListaEncadeadaSimplesDesordenada;
 
