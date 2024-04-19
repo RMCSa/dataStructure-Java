@@ -1,7 +1,10 @@
 package LinkedList.Ordenadas.ListaCircularOrdenada;
 import LinkedList.Clonador.Clonador;
 /**
- * author: Rafael Moreira Cavalcante de Souza - 23333
+ * authors: Rafael Moreira Cavalcante de Souza - 23333
+ * Vitor Henrique Girio Paes - 23340
+ * Marcelo Henrique Morello Manzo - 23326
+ * 
  */
 
 public class ListaCircularOrdenada<X extends Comparable<X>> implements Cloneable {

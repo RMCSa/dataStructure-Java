@@ -1,7 +1,11 @@
 package LinkedList.Desordenadas.ListaEncadeadaSimplesDesordenada;
 import LinkedList.Clonador.Clonador;
+
 /**
- * author: Rafael Moreira Cavalcante de Souza - 23333
+ * authors: Rafael Moreira Cavalcante de Souza - 23333
+ * Vitor Henrique Girio Paes - 23340
+ * Marcelo Henrique Morello Manzo - 23326
+ * 
  */
 public class ListaEncadeadaSimplesDesordenada<X> implements Cloneable {
     private class No implements Cloneable {

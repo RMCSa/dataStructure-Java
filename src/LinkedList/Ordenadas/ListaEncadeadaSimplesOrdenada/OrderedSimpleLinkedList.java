@@ -3,7 +3,7 @@ import LinkedList.Clonador.Clonador;
 /**
  * author: Rafael Moreira Cavalcante de Souza - 23333
  */
-// Tava testando o inglês refazendo a lista ordenada antes do senhor pedir 
+// Tava testando o inglês refazendo a lista ordenada antes  
 public class OrderedSimpleLinkedList <X extends Comparable<X>> implements Cloneable{
     private class Node implements Cloneable {
         private X data;
@@ -12,7 +12,6 @@ public class OrderedSimpleLinkedList <X extends Comparable<X>> implements Clonea
         public Node(X d, Node n){
             this.data = d;
             this.next = n;
-        
         }
         public Node(X d){
             this.data = d;  
