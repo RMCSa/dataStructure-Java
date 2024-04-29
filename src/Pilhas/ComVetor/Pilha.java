@@ -20,9 +20,18 @@ public class Pilha<X> implements Cloneable {
         this.tamanhoInicial = 10;
     }
 
-    private void redimensioneSe(float fator) {
+    private void redimensioneSeParaCima(float fator) {
         // X[] novo = new X [Math.ceil(this.elemento.length*fator)];
         Object[] novo = new Object[(int)Math.ceil(this.elemento.length * fator)];
+
+        for (int i = 0; i <= this.ultimo; i++)
+            novo[i] = this.elemento[i];
+
+        this.elemento = novo;
+    }
+
+    private void redimensioneSeParaBaixo(){
+        Object[] novo = new Object[(int)Math.ceil(this.elemento.length /2)];
 
         for (int i = 0; i <= this.ultimo; i++)
             novo[i] = this.elemento[i];
@@ -53,7 +62,7 @@ public class Pilha<X> implements Cloneable {
             throw new Exception("Falta o que guardar");
 
         if (this.ultimo + 1 == this.elemento.length) // cheia
-            this.redimensioneSe(2.0F);
+            this.redimensioneSeParaCima(2.0F);
 
         this.ultimo++;
 
@@ -87,7 +96,7 @@ public class Pilha<X> implements Cloneable {
 
         if (this.elemento.length > this.tamanhoInicial &&
                 this.ultimo + 1 <= Math.round(this.elemento.length * 0.25F))
-            this.redimensioneSe(0.5F);
+            this.redimensioneSeParaCima(0.5F);
     }
 
     public boolean isCheia() {
