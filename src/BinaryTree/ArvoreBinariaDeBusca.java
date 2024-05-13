@@ -1,5 +1,6 @@
 package BinaryTree;
 
+import java.io.EOFException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -79,9 +80,9 @@ public class ArvoreBinariaDeBusca<X extends Comparable<X>> implements Cloneable 
         if (inf == null)
             throw new Exception("informacao ausente");
 
-        No info;
+        X info;
         if (inf instanceof Cloneable)
-            info = (X) meuCloneDeX(inf);
+            info = (X)meuCloneDeX(inf);
         else
             info = inf;
 
@@ -120,14 +121,15 @@ public class ArvoreBinariaDeBusca<X extends Comparable<X>> implements Cloneable 
     public boolean tem(X info) throws Exception {
         if (info == null)
             throw new Exception("informacao ausente");
+        if (this.raiz == null) return false;
 
         No atual = this.raiz;
 
         for (;;){
             if (atual == null) {
-                throw new Exception();
+                return false;
             }
-            int comparacao = info.compareTo(atual.info);
+            int comparacao = info.compareTo(atual.getInfo());
 
             if (comparacao == 0) {
                 return true;
@@ -140,7 +142,6 @@ public class ArvoreBinariaDeBusca<X extends Comparable<X>> implements Cloneable 
                 atual = atual.getDir();
             }
         }
-        // complete a implementacao
     }
 
     public X getMenor() throws Exception{
@@ -151,29 +152,72 @@ public class ArvoreBinariaDeBusca<X extends Comparable<X>> implements Cloneable 
 
         for(;;){
             if (atual.getEsq() == null){
-                return atual.info;
+                return atual.getInfo();
             }
             atual = atual.getEsq();
         }
-
     }
 
     public X getMaior() throws Exception {
         No atual = this.raiz;
+        X ret = null; 
+
         if (atual == null) {
             throw new Exception("Nó nulo");
         }
-
         for (;;) {
             if (atual.getDir() == null) {
-                return atual.info;
+                ret = atual.getInfo();
             }
             atual = atual.getDir();
         }
+
+        return ret;
     }
 
-    @Override 
-    public String toString() {
-        String ret = "";
+    public void remova(X info) throws Exception{
+        if(info == null){
+            throw new Exception("Informação ausente");
+        }
+        if (this.raiz == null){
+            throw new Exception("Nó nulo");
+        }
+        if (!tem(info)){
+            throw new Exception("Informação Inexistente");
+        }
+        if (this.raiz.getInfo() == info){
+            this.raiz = null;
+        }
+        No pai = this.raiz;
+        No filho;
+        for(;;){
+            int comparacao = info.compareTo(pai.getInfo());
+
+            if (comparacao == 0) {
+
+                
+            }
+            if (comparacao < 0) {
+                filho = pai.getEsq();
+                if (filho.getInfo() == info && filho.getEsq() == null) {
+                    pai.setEsq(null);
+                    if (filho.getDir() != null){
+                        this.raiz = pai;
+                        inclua(filho.getDir().info);
+                    }
+                }
+            }
+            else{
+                filho = pai.getDir();
+                if (filho.getInfo() == info && filho.getDir() == null) {
+                    pai.setDir(null);
+                    if (filho.getEsq() != null) {
+                        this.raiz = pai;
+                        inclua(filho.getEsq().info);
+                    }
+                }
+            }
+        }
     }
+
 }
