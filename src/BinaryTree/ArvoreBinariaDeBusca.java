@@ -146,14 +146,30 @@ public class ArvoreBinariaDeBusca<X extends Comparable<X>> implements Cloneable 
     public X getMenor() throws Exception{
         No atual = this.raiz;
         if (atual == null) {
+            throw new Exception("Nó nulo");
+        }
 
-            
+        for(;;){
+            if (atual.getEsq() == null){
+                return atual.info;
+            }
+            atual = atual.getEsq();
         }
 
     }
 
     public X getMaior() throws Exception {
+        No atual = this.raiz;
+        if (atual == null) {
+            throw new Exception("Nó nulo");
+        }
 
+        for (;;) {
+            if (atual.getDir() == null) {
+                return atual.info;
+            }
+            atual = atual.getDir();
+        }
     }
 
     @Override 
