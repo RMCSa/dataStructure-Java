@@ -4,8 +4,6 @@ import java.io.EOFException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import com.apple.laf.resources.aqua;
-
 public class ArvoreBinariaDeBusca<X extends Comparable<X>> implements Cloneable {
     private class No {
         private No esq;
@@ -55,6 +53,41 @@ public class ArvoreBinariaDeBusca<X extends Comparable<X>> implements Cloneable 
         }
 
         // métodos obrigatórios
+        @Override
+        public String toString() {
+            return this.info.toString();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (this.getClass() != obj.getClass())
+                return false;
+            No no = (No) obj;
+            return this.info.equals(no.info);
+        }
+
+        @Override
+        public int hashCode() {
+            int ret = 777;
+            ret = 7 * ret + this.info.hashCode();
+            if (ret < 0)
+                ret = -ret;
+            return ret;
+        }
+
+        @Override
+        public No clone() {
+            No ret = new No(this.info);
+            if (this.esq != null)
+                ret.esq = this.esq.clone();
+            if (this.dir != null)
+                ret.dir = this.dir.clone();
+            return ret;
+        }
     }
 
     private No raiz;
@@ -107,13 +140,14 @@ public class ArvoreBinariaDeBusca<X extends Comparable<X>> implements Cloneable 
                     atual.setEsq(new No(info));
                     return;
                 }
-            else // deve-se inserir info para o lado direito
-            if (atual.getDir() != null)
-                atual = atual.getDir();
-            else // achei onde inserir; eh para a direito do atual
-            {
-                atual.setDir(new No(info));
-                return;
+            else { // deve-se inserir info para o lado direito
+                if (atual.getDir() != null)
+                    atual = atual.getDir();
+                else // achei onde inserir; eh para a direito do atual
+                {
+                    atual.setDir(new No(info));
+                    return;
+                }
             }
         }
     }
@@ -168,6 +202,7 @@ public class ArvoreBinariaDeBusca<X extends Comparable<X>> implements Cloneable 
         for (;;) {
             if (atual.getDir() == null) {
                 ret = atual.getInfo();
+                break;
             }
             atual = atual.getDir();
         }
@@ -182,42 +217,204 @@ public class ArvoreBinariaDeBusca<X extends Comparable<X>> implements Cloneable 
         if (this.raiz == null){
             throw new Exception("Nó nulo");
         }
-        if (!tem(info)){
+        if (!tem(info)){ //se não for encontrada na arvore
             throw new Exception("Informação Inexistente");
         }
+
+        /* 
+        Não pode pq se a raiz tiver filhos tudo morre, veja o else
         if (this.raiz.getInfo() == info){
             this.raiz = null;
+            return;
         }
-        No pai = this.raiz;
-        No filho;
-        for(;;){
-            int comparacao = info.compareTo(pai.getInfo());
+        */
 
-            if (comparacao == 0) {
+        No atual = this.raiz;
+        No pai = null;
+        boolean filhoEsquerdo = true;
 
-                
+        for (;;){
+            /* 
+            Devido a verificação anterior(tem), atual nunca será nulo
+            if (atual == null){
+                break;
             }
-            if (comparacao < 0) {
-                filho = pai.getEsq();
-                if (filho.getInfo() == info && filho.getEsq() == null) {
-                    pai.setEsq(null);
-                    if (filho.getDir() != null){
-                        this.raiz = pai;
-                        inclua(filho.getDir().info);
-                    }
+            */
+            int comparacao = info.compareTo(atual.getInfo());
+            if (comparacao == 0){
+                break;
+            }
+            pai = atual;
+            if (comparacao < 0){
+                atual = atual.getEsq();
+                filhoEsquerdo = true;
+            }
+            else{
+                atual = atual.getDir();
+                filhoEsquerdo = false;
+            }
+        }
+        /* 
+        Atual nunca será nulo
+        if (atual == null){
+            throw new Exception("Informação Inexistente");
+        }
+        */
+
+        // se a info for encontrada numa folha, deslique a folha da árvore,
+        // fazendo o ponteiro que aponta para ela dentro do seu nó pai,
+        // tornar-se null
+        if ( atual.getEsq() == null && atual.getDir() == null){
+            if (atual == this.raiz) {
+                this.raiz = null;
+            } else if (filhoEsquerdo){
+                pai.setEsq(null);
+            }
+            else{
+                pai.setDir(null);
+            }
+        }
+        // se info for encontrada num nó N, que não é folha, sendo que N
+        // só tem filho à esquerda, e sendo N filho esquerdo de um certo
+        // pai P, faça o ponteiro esquerdo de P, passar a apontar para
+        // esse filho que ha na esquerda de N
+        else if ( atual.getDir() == null && filhoEsquerdo) {
+            if (atual == this.raiz) {
+                this.raiz = atual.getEsq();
+            }
+            else{
+                pai.setEsq(atual.getEsq());
+            }
+        }
+
+        // se info for encontrada num nó N, que não é folha, sendo que N
+        // só tem filho à esquerda, e sendo N filho direito de um certo
+        // pai P, faça o ponteiro direito de P, passar a apontar para
+        // esse filho que ha na esquerda de N
+        else if ( atual.getDir() == null && !filhoEsquerdo){
+            if (atual == this.raiz) {
+                this.raiz = atual.getEsq();
+            }
+            else {
+                pai.setDir(atual.getEsq());
+            }
+        }
+
+        // se info for encontrada num nó N, que não é folha, sendo que N
+        // só tem filho à direita, e sendo N filho esquerdo de um certo
+        // pai P, faça o ponteiro esquerdo de P, passar a apontar para
+        // esse filho que ha na direita de N
+        else if ( atual.getEsq() == null && filhoEsquerdo){
+            if (atual == this.raiz) {
+                this.raiz = atual.getDir();
+            }
+            else{
+                pai.setEsq(atual.getDir());
+            }
+        }
+
+        // se info for encontrada num nó N, que não é folha, sendo que N
+        // só tem filho à direita, e sendo N filho direita de um certo
+        // pai P, faça o ponteiro direito de P, passar a apontar para
+        // esse filho que ha na direita de N
+        else if (atual.getEsq() == null && !filhoEsquerdo){
+            if (atual == this.raiz) {
+                this.raiz = atual.getDir();
+            }
+            else{
+                pai.setDir(atual.getDir());
+            }
+        }
+
+        // se info for encontrada num nó N, que não é folha e tem 2 filhos,
+        // encontre a informação info que existe à extrema esquerda da
+        // subarvore direita de N ou à extrema direita da subarvore esquerda
+        // de N; remova o nó que contém info e substitua dentro do nó N,
+        // a informação que ali se encontra por info
+        else{
+            No sucessor = null;
+            if (atual.getEsq() != null){
+                pai = atual;
+                sucessor = atual.getEsq();
+                filhoEsquerdo = true;
+                while (sucessor.getDir() != null){
+                    pai = sucessor;
+                    sucessor = sucessor.getDir();
+                    filhoEsquerdo = false;
                 }
             }
             else{
-                filho = pai.getDir();
-                if (filho.getInfo() == info && filho.getDir() == null) {
-                    pai.setDir(null);
-                    if (filho.getEsq() != null) {
-                        this.raiz = pai;
-                        inclua(filho.getEsq().info);
-                    }
+                pai = atual;
+                sucessor = atual.getDir();
+                filhoEsquerdo = false;
+                while (sucessor.getEsq() != null){
+                    pai = sucessor;
+                    sucessor = sucessor.getEsq();
+                    filhoEsquerdo = true;
                 }
             }
+            if (filhoEsquerdo){
+                pai.setEsq(null);
+            }
+            else{
+                pai.setDir(null);
+            }
+            
+            atual.setInfo(sucessor.getInfo());
         }
+    }
+    
+    public void emOrdem(No atual){
+        if (atual != null){
+            emOrdem(atual.getEsq());
+            System.out.println(atual.getInfo());
+            emOrdem(atual.getDir());
+        }
+    }
+
+    public void preOrdem(No atual){
+        if (atual != null) {
+            System.out.println(atual.getInfo());
+            preOrdem(atual.getEsq());
+            preOrdem(atual.getDir());
+        }
+    }
+
+    public void posOrdem(No atual){
+        if (atual != null) {
+            posOrdem(atual.getEsq());
+            posOrdem(atual.getDir());
+            System.out.println(atual.getInfo());
+        }
+    }
+    
+    @Override
+    public String toString() {
+        return "";
+    }
+
+    public No getRaiz(){
+        return this.raiz;
+    }
+
+    public static void main(String[] args) throws Exception{
+        ArvoreBinariaDeBusca<Integer> arvore = new ArvoreBinariaDeBusca<>();
+        arvore.inclua(10);
+        arvore.inclua(8);
+        arvore.inclua(18);
+        arvore.inclua(5);
+        arvore.inclua(9);
+        arvore.inclua(7);
+        arvore.inclua(13);
+        arvore.inclua(20);
+        arvore.remova(10);
+        System.out.println("Pre Ordem:");
+        arvore.preOrdem(arvore.getRaiz());
+        System.out.println("Em Ordem:");
+        arvore.emOrdem(arvore.getRaiz());
+        System.out.println("Pos Ordem:");
+        arvore.posOrdem(arvore.getRaiz());
+
     }
 
 }
