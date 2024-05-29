@@ -359,11 +359,13 @@ public class ArvoreBinariaDeBusca<X extends Comparable<X>> implements Cloneable 
             else{
                 pai.setDir(null);
             }
-            
+
             atual.setInfo(sucessor.getInfo());
         }
     }
-    
+
+
+    // O método emOrdem percorre a árvore binária de gorma que o nó atual é visitado entre os filhos
     public void emOrdem(No atual){
         if (atual != null){
             emOrdem(atual.getEsq());
@@ -372,6 +374,7 @@ public class ArvoreBinariaDeBusca<X extends Comparable<X>> implements Cloneable 
         }
     }
 
+    // O método preOrdem percorre a árvore de forma que o nó atual é visitado antes de seus filhos
     public void preOrdem(No atual){
         if (atual != null) {
             System.out.println(atual.getInfo());
@@ -380,6 +383,7 @@ public class ArvoreBinariaDeBusca<X extends Comparable<X>> implements Cloneable 
         }
     }
 
+    // O método posOrdem percorre a árvore de forma que o nó atual é visitado depois de seus filhos
     public void posOrdem(No atual){
         if (atual != null) {
             posOrdem(atual.getEsq());

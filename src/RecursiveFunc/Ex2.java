@@ -8,19 +8,19 @@ public class Ex2 {
         if (num1 == 0)
             return num2;
 
-        if (Ex1.exe01(num1)) {
+        if (Ex1.ehNegativo(num1)) {
             num1++;
             num2--;
             return somaRecursiva(num1, num2);
         }
-        
+
         num1--;
         num2++;
         return somaRecursiva(num1, num2);
     }
 
     public static void main(String[] args) {
-        System.out.println(somaRecursiva(-10, -10));
+        System.out.println(somaRecursiva(-4, -4));
     }
 
 }
