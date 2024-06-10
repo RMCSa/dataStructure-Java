@@ -206,35 +206,76 @@ public class ArvoreBinariaDeBusca<X extends Comparable<X>> implements Cloneable 
         return 1 + getQtdDeNodos(r.getEsq()) + getQtdDeNodos(r.getDir());
     }
 
-    public void balanceieSe() {
+    public void balanceieSe() throws Exception{
         balanceieSe(this.raiz);
     }
 
-    private void balanceieSe(No r) {
-        // enquanto a quantidade de nós a esquerda menos
-        // a quantidade de nós a direita for maior 1,
-        // remova da esquerda a extrema direita, guardando
-        // numa variável o valor ali presente; substitua por
-        // esse valor o valor presente na raiz, salvando-o
-        // antes numa outra variavel; insira na arvore o valor
-        // que estava presente na raiz
-        // OBS: CHAME 1 SÓ VEZ getQtdDeNodos PARA A ESQUERDA E
-        // PARA A DIREITA, ARMAZENANDO OS RESULTADOS EM
-        // VARIÁVEIS QUE VOCÊ ATUALIZA NO WHILE
+    private void balanceieSe(No r) throws Exception {
+        if ( r == null ) return;
 
+        int qtdDir = getQtdDeNodos(r.getDir());
+        int qtdEsq = getQtdDeNodos(r.getEsq());
 
-        // enquanto a quantidade de nós a direita menos
-        // a quantidade de nós a esquerda for maior 1,
-        // remova da direita a extrema esquerda, guardando
-        // numa variável o valor ali presente; substitua por
-        // esse valor o valor presente na raiz, salvando-o
-        // antes numa outra variavel; insira na arvore o valor
-        // que estava presente na raiz
-        // OBS: CHAME 1 SÓ VEZ getQtdDeNodos PARA A ESQUERDA E
-        // PARA A DIREITA, ARMAZENANDO OS RESULTADOS EM
-        // VARIÁVEIS QUE VOCÊ ATUALIZA NO WHILE
+        while ( Math.abs(qtdDir - qtdEsq) > 1 ) {
+            // enquanto a quantidade de nós a esquerda menos
+            // a quantidade de nós a direita for maior 1,
+            if (qtdEsq - qtdDir > 1) {
+                X antigaRaiz = r.getInfo();
+                No atual = r;
 
-        // faça recursão para a esquerda e para a direita
+            // remova da esquerda a extrema direita, guardando
+            // numa variável o valor ali presente; 
+                atual = atual.getEsq();
+                while (atual.getDir() != null){
+                    atual = atual.getDir();
+                } 
+
+            // substitua por esse valor o valor presente na raiz, salvando-o
+            // antes numa outra variavel;
+                r.setInfo(atual.getInfo()); 
+                remova(atual.getInfo());
+                
+            // insira na arvore o valor que estava presente na raiz
+                inclua(antigaRaiz);
+                qtdEsq--;
+                qtdDir++;
+
+            // OBS: CHAME 1 SÓ VEZ getQtdDeNodos PARA A ESQUERDA E
+            //      PARA A DIREITA, ARMAZENANDO OS RESULTADOS EM
+            //      VARIÁVEIS QUE VOCÊ ATUALIZA NO WHILE
+            }
+            
+            // enquanto a quantidade de nós a direita menos
+            // a quantidade de nós a esquerda for maior 1,
+            if (qtdDir - qtdEsq > 1) {
+                X antigaRaiz = r.getInfo();
+                No atual = r;
+
+            // remova da direita a extrema esquerda, guardando
+            // numa variável o valor ali presente; 
+                atual = atual.getDir();
+                while (atual.getEsq() != null){
+                    atual = atual.getEsq();
+                } 
+            
+            // substitua por esse valor o valor presente na raiz, salvando-o
+            // antes numa outra variavel; 
+                r.setInfo(atual.getInfo()); 
+                remova(atual.getInfo());
+            
+            // insira na arvore o valor que estava presente na raiz
+            inclua(antigaRaiz);
+            qtdEsq++;
+            qtdDir--;
+
+            // OBS: CHAME 1 SÓ VEZ getQtdDeNodos PARA A ESQUERDA E
+            //      PARA A DIREITA, ARMAZENANDO OS RESULTADOS EM
+            //      VARIÁVEIS QUE VOCÊ ATUALIZA NO WHILE
+            }
+        }
+		// faça recursão para a esquerda e para a direita
+        balanceieSe(r.getDir());
+        balanceieSe(r.getEsq());
     }
 
     public X getMaior () throws Exception
@@ -363,7 +404,7 @@ public class ArvoreBinariaDeBusca<X extends Comparable<X>> implements Cloneable 
         // a informação que ali se encontra por info
         else{
             No sucessor = null;
-            if (atual.getEsq() != null){
+            if (getQtdDeNodos(atual.getEsq()) > getQtdDeNodos(atual.getDir())){
                 pai = atual;
                 sucessor = atual.getEsq();
                 filhoEsquerdo = true;
