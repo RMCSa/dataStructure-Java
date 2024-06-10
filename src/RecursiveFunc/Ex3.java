@@ -16,7 +16,7 @@ public class Ex3 {
     }
 
     public static void main(String[] args) {
-        System.out.println(subtracaoRecursiva(-4, -8));
+        System.out.println(subtracaoRecursiva(3, 4));
     }
 
 }

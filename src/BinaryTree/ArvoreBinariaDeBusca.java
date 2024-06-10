@@ -221,25 +221,11 @@ public class ArvoreBinariaDeBusca<X extends Comparable<X>> implements Cloneable 
             throw new Exception("Informação Inexistente");
         }
 
-        /* 
-        Não pode pq se a raiz tiver filhos tudo morre, veja o else
-        if (this.raiz.getInfo() == info){
-            this.raiz = null;
-            return;
-        }
-        */
-
         No atual = this.raiz;
         No pai = null;
         boolean filhoEsquerdo = true;
 
         for (;;){
-            /* 
-            Devido a verificação anterior(tem), atual nunca será nulo
-            if (atual == null){
-                break;
-            }
-            */
             int comparacao = info.compareTo(atual.getInfo());
             if (comparacao == 0){
                 break;
@@ -254,12 +240,6 @@ public class ArvoreBinariaDeBusca<X extends Comparable<X>> implements Cloneable 
                 filhoEsquerdo = false;
             }
         }
-        /* 
-        Atual nunca será nulo
-        if (atual == null){
-            throw new Exception("Informação Inexistente");
-        }
-        */
 
         // se a info for encontrada numa folha, deslique a folha da árvore,
         // fazendo o ponteiro que aponta para ela dentro do seu nó pai,
@@ -364,12 +344,39 @@ public class ArvoreBinariaDeBusca<X extends Comparable<X>> implements Cloneable 
         }
     }
 
+    private void balanceieSe(No r) {
+        // enquanto a quantidade de nós a esquerda menos
+        // a quantidade de nós a direita for maior 1,
+        // remova da esquerda a extrema direita, guardando
+        // numa variável o valor ali presente; substitua por
+        // esse valor o valor presente na raiz, salvando-o
+        // antes numa outra variavel; insira na arvore o valor
+        // que estava presente na raiz
+        // OBS: CHAME 1 SÓ VEZ getQtdDeNodos PARA A ESQUERDA E
+        // PARA A DIREITA, ARMAZENANDO OS RESULTADOS EM
+        // VARIÁVEIS QUE VOCÊ ATUALIZA NO WHILE
+
+        // enquanto a quantidade de nós a direita menos
+        // a quantidade de nós a esquerda for maior 1,
+        // remova da direita a extrema esquerda, guardando
+        // numa variável o valor ali presente; substitua por
+        // esse valor o valor presente na raiz, salvando-o
+        // antes numa outra variavel; insira na arvore o valor
+        // que estava presente na raiz
+        // OBS: CHAME 1 SÓ VEZ getQtdDeNodos PARA A ESQUERDA E
+        // PARA A DIREITA, ARMAZENANDO OS RESULTADOS EM
+        // VARIÁVEIS QUE VOCÊ ATUALIZA NO WHILE
+
+        // faça recursão para a esquerda e para a direita
+    }
+
 
     // O método emOrdem percorre a árvore binária de gorma que o nó atual é visitado entre os filhos
     public void emOrdem(No atual){
         if (atual != null){
             emOrdem(atual.getEsq());
             System.out.println(atual.getInfo());
+    
             emOrdem(atual.getDir());
         }
     }
@@ -412,12 +419,10 @@ public class ArvoreBinariaDeBusca<X extends Comparable<X>> implements Cloneable 
         arvore.inclua(13);
         arvore.inclua(20);
         arvore.remova(10);
-        System.out.println("Pre Ordem:");
-        arvore.preOrdem(arvore.getRaiz());
         System.out.println("Em Ordem:");
         arvore.emOrdem(arvore.getRaiz());
-        System.out.println("Pos Ordem:");
-        arvore.posOrdem(arvore.getRaiz());
+        System.out.println("Número de Nós: " + ArvoreBinariaDeBusca.aux);
+        
 
     }
 
