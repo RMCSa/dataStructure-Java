@@ -152,62 +152,112 @@ public class ArvoreBinariaDeBusca<X extends Comparable<X>> implements Cloneable 
         }
     }
 
-    public boolean tem(X info) throws Exception {
-        if (info == null)
-            throw new Exception("informacao ausente");
-        if (this.raiz == null) return false;
+    public boolean tem (X info) throws Exception
+	{
+		if (info==null) throw new Exception ("informacao ausente");
 
-        No atual = this.raiz;
-
-        for (;;){
-            if (atual == null) {
-                return false;
-            }
+        No atual=this.raiz;
+        for(;;) // forever
+        {
+			if (atual==null) return false;
+			
             int comparacao = info.compareTo(atual.getInfo());
-
-            if (comparacao == 0) {
-                return true;
-            }
-
-            if (comparacao < 0) {
-                atual = atual.getEsq();
-            }
-            else{
-                atual = atual.getDir();
-            }
+            if (comparacao==0) return true;
+            
+            if (comparacao<0)
+                atual=atual.getEsq();
+            else // comparacao>0
+                atual=atual.getDir();
         }
     }
+        
 
-    public X getMenor() throws Exception{
-        No atual = this.raiz;
-        if (atual == null) {
-            throw new Exception("Nó nulo");
-        }
-
-        for(;;){
-            if (atual.getEsq() == null){
-                return atual.getInfo();
-            }
-            atual = atual.getEsq();
-        }
+    public X getMenor () throws Exception
+    { 
+        if (this.raiz==null) throw new Exception ("arvore vazia");
+	    
+        No atual=this.raiz ; X ret =null;
+        for(;;) // forever
+        {
+			if (atual.getEsq()==null)
+			{
+				if (atual.getInfo() instanceof Cloneable)
+     				ret = (X)meuCloneDeX(atual.getInfo());
+     			else
+     			    ret = atual.getInfo();
+     			
+     			break;
+			}
+            else
+                atual=atual.getEsq();
+		}
+		
+		return ret;
     }
 
-    public X getMaior() throws Exception {
-        No atual = this.raiz;
-        X ret = null; 
+    public int getQtdDeNodos() throws Exception {
+        return getQtdDeNodos(this.raiz);
+    }
 
-        if (atual == null) {
-            throw new Exception("Nó nulo");
-        }
-        for (;;) {
-            if (atual.getDir() == null) {
-                ret = atual.getInfo();
-                break;
-            }
-            atual = atual.getDir();
-        }
+    private int getQtdDeNodos(No r) {
+        if (r == null)
+            return 0;
 
-        return ret;
+        return 1 + getQtdDeNodos(r.getEsq()) + getQtdDeNodos(r.getDir());
+    }
+
+    public void balanceieSe() {
+        balanceieSe(this.raiz);
+    }
+
+    private void balanceieSe(No r) {
+        // enquanto a quantidade de nós a esquerda menos
+        // a quantidade de nós a direita for maior 1,
+        // remova da esquerda a extrema direita, guardando
+        // numa variável o valor ali presente; substitua por
+        // esse valor o valor presente na raiz, salvando-o
+        // antes numa outra variavel; insira na arvore o valor
+        // que estava presente na raiz
+        // OBS: CHAME 1 SÓ VEZ getQtdDeNodos PARA A ESQUERDA E
+        // PARA A DIREITA, ARMAZENANDO OS RESULTADOS EM
+        // VARIÁVEIS QUE VOCÊ ATUALIZA NO WHILE
+
+
+        // enquanto a quantidade de nós a direita menos
+        // a quantidade de nós a esquerda for maior 1,
+        // remova da direita a extrema esquerda, guardando
+        // numa variável o valor ali presente; substitua por
+        // esse valor o valor presente na raiz, salvando-o
+        // antes numa outra variavel; insira na arvore o valor
+        // que estava presente na raiz
+        // OBS: CHAME 1 SÓ VEZ getQtdDeNodos PARA A ESQUERDA E
+        // PARA A DIREITA, ARMAZENANDO OS RESULTADOS EM
+        // VARIÁVEIS QUE VOCÊ ATUALIZA NO WHILE
+
+        // faça recursão para a esquerda e para a direita
+    }
+
+    public X getMaior () throws Exception
+    {
+	    if (this.raiz==null) throw new Exception ("arvore vazia");
+	    
+        No atual=this.raiz; X ret=null;
+        for(;;) // forever
+        {
+			if (atual.getDir()==null)
+			{
+				if (atual.getInfo() instanceof Cloneable)
+     				ret = (X)meuCloneDeX(atual.getInfo());
+     			else
+     			    ret = atual.getInfo();
+     			
+     			break;
+			}
+            else
+                atual=atual.getDir();
+		}
+		
+		return ret;
     }
 
     public void remova(X info) throws Exception{
@@ -343,33 +393,6 @@ public class ArvoreBinariaDeBusca<X extends Comparable<X>> implements Cloneable 
             atual.setInfo(sucessor.getInfo());
         }
     }
-
-    private void balanceieSe(No r) {
-        // enquanto a quantidade de nós a esquerda menos
-        // a quantidade de nós a direita for maior 1,
-        // remova da esquerda a extrema direita, guardando
-        // numa variável o valor ali presente; substitua por
-        // esse valor o valor presente na raiz, salvando-o
-        // antes numa outra variavel; insira na arvore o valor
-        // que estava presente na raiz
-        // OBS: CHAME 1 SÓ VEZ getQtdDeNodos PARA A ESQUERDA E
-        // PARA A DIREITA, ARMAZENANDO OS RESULTADOS EM
-        // VARIÁVEIS QUE VOCÊ ATUALIZA NO WHILE
-
-        // enquanto a quantidade de nós a direita menos
-        // a quantidade de nós a esquerda for maior 1,
-        // remova da direita a extrema esquerda, guardando
-        // numa variável o valor ali presente; substitua por
-        // esse valor o valor presente na raiz, salvando-o
-        // antes numa outra variavel; insira na arvore o valor
-        // que estava presente na raiz
-        // OBS: CHAME 1 SÓ VEZ getQtdDeNodos PARA A ESQUERDA E
-        // PARA A DIREITA, ARMAZENANDO OS RESULTADOS EM
-        // VARIÁVEIS QUE VOCÊ ATUALIZA NO WHILE
-
-        // faça recursão para a esquerda e para a direita
-    }
-
 
     // O método emOrdem percorre a árvore binária de gorma que o nó atual é visitado entre os filhos
     public void emOrdem(No atual){
