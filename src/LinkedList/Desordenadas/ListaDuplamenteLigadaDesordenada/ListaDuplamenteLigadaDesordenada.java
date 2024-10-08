@@ -1,9 +1,11 @@
 package LinkedList.Desordenadas.ListaDuplamenteLigadaDesordenada;
+
 import LinkedList.Clonador.Clonador;
+
 /**
  * authors: Rafael Moreira Cavalcante de Souza - 23333
- *         Vitor Henrique Girio Paes          - 23340
- *         Marcelo Henrique Morello Manzo     - 23326
+ * Vitor Henrique Girio Paes - 23340
+ * Marcelo Henrique Morello Manzo - 23326
  * 
  */
 public class ListaDuplamenteLigadaDesordenada<X> implements Cloneable {
@@ -233,6 +235,29 @@ public class ListaDuplamenteLigadaDesordenada<X> implements Cloneable {
             this.primeiro = null;
     }
 
+    public void remova(X item) throws Exception {
+        if (item == null)
+            throw new Exception("Informação Ausente");
+        if (this.primeiro == null)
+            throw new Exception("Nó Nulo, nada a retirar");
+
+        if (this.primeiro.getInfo().equals(item)) {
+            removaPrimeiro();
+            return;
+        }
+
+        No atual = this.primeiro;
+        while (atual != null && !atual.getInfo().equals(item))
+            atual = atual.getProx();
+        if (atual == null)
+            throw new Exception("Informação Ausente");
+
+        if (atual.getProx() != null)
+            atual.getProx().setAnt(atual.getAnt());
+        if (atual.getAnt() != null)
+            atual.getAnt().setProx(atual.getProx());
+    }
+
     public void remova(int posicao) throws Exception {
         if (this.primeiro == null)
             throw new Exception("Nó nulo, nada a retirar");
@@ -271,6 +296,16 @@ public class ListaDuplamenteLigadaDesordenada<X> implements Cloneable {
                 this.primeiro = atual;
             atual = temp;
         }
+    }
+
+    public int getTamanho() {
+        int tamanho = 0;
+        No atual = this.primeiro;
+        while (atual != null) {
+            tamanho++;
+            atual = atual.getProx();
+        }
+        return tamanho;
     }
 
     @Override

@@ -288,6 +288,30 @@ public class ListaEncadeadaSimplesDesordenada<X> implements Cloneable {
         anterior.setProx(atual.getProx());
     }
 
+    public void remova(X item) throws Exception {
+        if (this.primeiro == null)
+            throw new Exception("Nó nulo, nada a retirar");
+        if (item == null)
+            throw new Exception("Informação Ausente");
+
+        if (this.primeiro.getInfo().equals(item)) {
+            removaPrimeiro();
+            return;
+        }
+
+        No anterior = this.primeiro;
+        No atual = this.primeiro.getProx();
+
+        while (atual != null && !atual.getInfo().equals(item)) {
+            anterior = atual;
+            atual = atual.getProx();
+        }
+        if (atual == null)
+            throw new Exception("Item não encontrado");
+
+        anterior.setProx(atual.getProx());
+    }
+
     public void reverter() throws Exception {
         if (this.primeiro == null||this.primeiro.getProx() == null)
             return;

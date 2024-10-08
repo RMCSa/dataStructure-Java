@@ -3,7 +3,7 @@ package Grafos;
 public class Aresta<T> {
     private Vertice<T> origem;
     private Vertice<T> destino;
-    private double peso; // O peso da aresta, se houver (para grafos ponderados)
+    private double peso; 
 
     public Aresta(Vertice<T> origem, Vertice<T> destino) {
         this(origem, destino, 1.0); 
