@@ -17,7 +17,7 @@ public class Graph {
         this.airports = new ListaEncadeadaSimplesDesordenada<>();
     }
 
-    // 1. Cadastramr um novo aeroporto
+    // 1. Cadastrar um novo aeroporto
     public void registerAirport(String name, String code) throws Exception {
         // Converte o nome e o código para maiúsculas por fim de padronização
         String nameUpper = name.toUpperCase();
