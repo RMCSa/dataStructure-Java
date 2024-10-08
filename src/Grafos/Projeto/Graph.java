@@ -17,7 +17,7 @@ public class Graph {
         this.airports = new ListaEncadeadaSimplesDesordenada<>();
     }
 
-    // Cadastramrde um novo aeroporto
+    // 1. Cadastramr um novo aeroporto
     public void registerAirport(String name, String code) throws Exception {
         // Converte o nome e o código para maiúsculas por fim de padronização
         String nameUpper = name.toUpperCase();
@@ -26,19 +26,18 @@ public class Graph {
         // Verifica se o aeroporto já está cadastrado
         for (int i = 0; i < airports.getTamanho(); i++) {
             Airport airport = airports.get(i);
-            if (airport.getCode().equals(codeUpper)) {
+            if (airport.getCode().equals(codeUpper) || airport.getName().equals(nameUpper)) {
                 throw new Exception("Aeroporto já cadastrado.");
             }
         }
 
-        
         // Adiciona o aeroporto à lista de aeroportos
         Airport airport = new Airport(nameUpper, codeUpper);
         airports.guardeNoFinal(airport);
         System.out.println("Aeroporto " + nameUpper + " (" + codeUpper + ") cadastrado com sucesso.");
     }
 
-    // Cadastramento de um voo com um determinado número entre dois aeroportos
+    // 2. Cadastramento de um voo com um determinado número entre dois aeroportos
     public void registerFlight(String origin, String destination, int number) throws Exception {
         // Converte os códigos dos aeroportos para maiúsculas por fim de padronização
         String originUpper = origin.toUpperCase();
@@ -46,38 +45,24 @@ public class Graph {
 
         // Verifica se os aeroportos de origem e destino existem
         Airport originAirport = findAirport(originUpper);
-        int destinationIndex = findAirportIndex(destinationUpper); // Encontra o índice do aeroporto de destino
+        // Encontra o índice do aeroporto de destino
+        int destinationIndex = findAirportIndex(destinationUpper); 
         if (originAirport == null) {
             throw new Exception("Aeroporto de origem não encontrado.");
         }
-        if (destinationIndex == -1) { // Verifica se o destino existe
+        // Verifica se o destino existe
+        if (destinationIndex == -1) { 
             throw new Exception("Aeroporto de destino não encontrado.");
         }
 
         // Cria um novo voo e o adiciona ao aeroporto de origem
-        Flight newFlight = new Flight(destinationIndex, number); // Passa o índice do destino
+        Flight newFlight = new Flight(destinationIndex, number); 
         originAirport.addFlight(newFlight);
         System.out.println(
                 "Voo Nº " + number + " (" + originUpper + " -> " + destinationUpper + ") cadastrado com sucesso.");
     }
 
-    // Remoção de um aeroporto indicado pelo número
-    public void removeAirport(String code) throws Exception {
-        // Converte o código para maiúsculas por fim de padronização
-        String codeUpper = code.toUpperCase();
-
-        // Verifica se o aeroporto existe
-        Airport airport = findAirport(codeUpper);
-        if (airport == null) {
-            throw new Exception("Aeroporto não encontrado.");
-        }
-
-        // Remove o aeroporto da lista de aeroportos
-        airports.remova(airport);
-        System.out.println("Aeroporto " + airport.getName() + " removido com sucesso.");
-    }
-
-    // Remoção de um voo indicado pelo número
+    // 3. Remoção de um voo indicado pelo número
     public void removeFlight(String origin, int number) throws Exception {
         // Converte o código para maiúsculas por fim de padronização
         String originUpper = origin.toUpperCase();
@@ -88,11 +73,39 @@ public class Graph {
             throw new Exception("Aeroporto de origem não encontrado.");
         }
 
-        // Remove o voo do aeroporto de origem
+        // Remove o voo do aeroporto de origem a partir do seu número
         originAirport.removeFlight(number);
         System.out.println("Voo Nº " + number + " removido com sucesso.");
     }
 
+    // 4. Listagem de voos de um aeroporto
+    public void listFlights(String origin) throws Exception {
+        String originUpper = origin.toUpperCase();
+
+        // Verifica se o aeroporto de origem existe
+        Airport originAirport = findAirport(originUpper);
+        if (originAirport == null) {
+            throw new Exception("\nAeroporto de origem não encontrado.");
+        }
+
+        int flightCount = originAirport.getFlights().getTamanho();
+        if (flightCount == 0) {
+            System.out.println("\nNenhum voo cadastrado para o aeroporto " + originUpper);
+            return;
+        }
+
+        System.out.println("\nVoos saindo de " + originAirport.getName() + ":");
+
+        // Exibe os voos a partir do aeroporto de origem
+        for (int i = 0; i < flightCount; i++) {
+            Flight flight = originAirport.getFlights().get(i);
+            Airport destinationAirport = airports.get(flight.getDestinationIndex());
+            System.out
+                    .println(originUpper + " -> " + destinationAirport.getCode() + " (Voo " + flight.getNumber() + ")");
+        }
+    }
+
+    // 5. Listagem de possíveis trajetos entre dois aeroportos
     public void listRoutes(String origin, String destination) throws Exception {
         // Converte os códigos dos aeroportos para maiúsculas por fim de padronização
         String originUpper = origin.toUpperCase();
@@ -100,13 +113,18 @@ public class Graph {
 
         // Verifica se os aeroportos de origem e destino existem
         Airport originAirportObject = findAirport(originUpper);
+        Airport destinationAirportObject = findAirport(destinationUpper);
         if (originAirportObject == null) {
             throw new Exception("Aeroporto de origem não encontrado.");
+        }
+        if (destinationAirportObject == null) {
+            throw new Exception("Aeroporto de destino não encontrado.");
         }
         if (originUpper.equals(destinationUpper)) {
             System.out.println("Origem e destino são iguais.");
             return;
         }
+
         // Verifica se o aeroporto de origem possui voos cadastrados
         if (originAirportObject.getFlights().getTamanho() == 0) {
             System.out.println("Nenhum voo cadastrado para o aeroporto " + originUpper);
@@ -132,7 +150,7 @@ public class Graph {
         while (!queue.isVazia()) {
             // Recupera o trajeto atual da fila dando acesso ao código último aeroporto visitado
             ListaEncadeadaSimplesDesordenada<String> currentRoute = queue.recupereUmItem();
-            // Remove o trajeto atual da fila
+            // Remove o trajeto atual da fila para que não seja processado novamente
             queue.removaUmItem();
             // Recupera o último aeroporto do trajeto atual
             String lastAirportInRoute = currentRoute.get(currentRoute.getTamanho() - 1);
@@ -176,31 +194,7 @@ public class Graph {
         }
     }
 
-    // Listagem dos possíveis trajetos para sair de um aeroporto e chegar a outro
-    public void listFlights(String origin) throws Exception {
-        String originUpper = origin.toUpperCase();
-
-        // Verifica se o aeroporto de origem existe
-        Airport originAirport = findAirport(originUpper);
-        if (originAirport == null) {
-            throw new Exception("\nAeroporto de origem não encontrado.");
-        }
-
-        int flightCount = originAirport.getFlights().getTamanho();
-        if (flightCount == 0) {
-            System.out.println("\nNenhum voo cadastrado para o aeroporto " + originUpper);
-            return;
-        }
-
-        System.out.println("\nVoos saindo de " + originAirport.getName() + ":");
-
-        // Exibe os voos a partir do aeroporto de origem
-        for (int i = 0; i < flightCount; i++) {
-            Flight flight = originAirport.getFlights().get(i);
-            Airport destinationAirport = airports.get(flight.getDestinationIndex()); 
-            System.out.println(originUpper + " -> " + destinationAirport.getCode() + " (Voo " + flight.getNumber() + ")");
-        }
-    }
+    // Funções auxiliares:
 
     // Listagem de aeroportos cadastrados
     public void listAirports() throws Exception {
@@ -243,6 +237,7 @@ public class Graph {
         return -1; // Retorna -1 se não encontrar o aeroporto
     }
 
+    // Menu de interação com o usuário
     public void displayMenu() throws Exception {
         while (true) {
             System.out.println("\n1. Cadastrar Aeroporto");
@@ -253,9 +248,9 @@ public class Graph {
             System.out.println("6. Sair");
 
             System.out.print("Escolha uma opção: ");
-            int option = Teclado.getUmInt();
-
+            
             try {
+                int option = Teclado.getUmInt();
                 switch (option) {
                     case 1:
                         System.out.print("Nome do aeroporto: ");
@@ -347,12 +342,8 @@ public class Graph {
         graph.registerAirport("Rio de Janeiro", "GIG");
         graph.registerAirport("São Paulo", "GRU");
         graph.registerAirport("Salvador", "SSA");
-        graph.registerAirport("TESTE", "TST");
-        graph.registerAirport("TESTE2", "TST2");
-
-        graph.registerFlight("TST", "TST2", 500);
-
-        graph.registerFlight("BSB", "TST", 107);
+        
+        graph.registerFlight("BSB", "SSA", 107);
         graph.registerFlight("CNF", "SSA", 214);
         graph.registerFlight("CNF", "GIG", 554);
         graph.registerFlight("CNF", "GRU", 101);
@@ -362,6 +353,10 @@ public class Graph {
         graph.registerFlight("GRU", "GIG", 89);
         graph.registerFlight("GRU", "CNF", 102);
         graph.registerFlight("SSA", "CNF", 215);
+
+        graph.registerAirport("TESTE", "TST");
+        graph.registerAirport("TESTE2", "TST2");
+        graph.registerFlight("TST", "TST2", 500);
         
         graph.displayMenu();
     }
