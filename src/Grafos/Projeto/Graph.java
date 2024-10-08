@@ -55,6 +55,14 @@ public class Graph {
             throw new Exception("Aeroporto de destino não encontrado.");
         }
 
+        // Verifica se o voo já está cadastrado
+        for (int i = 0; i < originAirport.getFlights().getTamanho(); i++) {
+            Flight flight = originAirport.getFlights().get(i);
+            if (flight.getNumber() == number) {
+                throw new Exception("Voo já cadastrado.");
+            }
+        }
+
         // Cria um novo voo e o adiciona ao aeroporto de origem
         Flight newFlight = new Flight(destinationIndex, number); 
         originAirport.addFlight(newFlight);
@@ -126,7 +134,7 @@ public class Graph {
         }
 
         // Verifica se o aeroporto de origem possui voos cadastrados
-        if (originAirportObject.getFlights().getTamanho() == 0) {
+        if (originAirportObject.getFlights().getTamanho()  == 0) {
             System.out.println("Nenhum voo cadastrado para o aeroporto " + originUpper);
             return;
         }
@@ -152,9 +160,9 @@ public class Graph {
             ListaEncadeadaSimplesDesordenada<String> currentRoute = queue.recupereUmItem();
             // Remove o trajeto atual da fila para que não seja processado novamente
             queue.removaUmItem();
-            // Recupera o último aeroporto do trajeto atual
+            // Recupera o código do último aeroporto do trajeto atual
             String lastAirportInRoute = currentRoute.get(currentRoute.getTamanho() - 1);
-            // Encontra o aeroporto pelo código
+            // Encontra o aeroporto por seu código
             Airport lastAirportObject = findAirport(lastAirportInRoute);
 
             // Percorre cada voo do aeroporto atual
