@@ -6,6 +6,7 @@ package Grafos.Projeto;
  * 
  */
 
+import Filas.ComListaEncadeada.Fila;
 import LinkedList.Desordenadas.ListaEncadeadaSimplesDesordenada.ListaEncadeadaSimplesDesordenada;
 
 // Estruturado como um Grafo, não genérico, para atender às necessidades específicas do projeto
@@ -92,81 +93,86 @@ public class Graph {
         System.out.println("Voo Nº " + number + " removido com sucesso.");
     }
 
-    // Listagem de todos os trajetos possíveis para chegar da origem ao destino
     public void listRoutes(String origin, String destination) throws Exception {
         // Converte os códigos dos aeroportos para maiúsculas por fim de padronização
         String originUpper = origin.toUpperCase();
         String destinationUpper = destination.toUpperCase();
 
         // Verifica se os aeroportos de origem e destino existem
-        Airport originAirport = findAirport(originUpper);
-        if (originAirport == null) {
+        Airport originAirportObject = findAirport(originUpper);
+        if (originAirportObject == null) {
             throw new Exception("Aeroporto de origem não encontrado.");
         }
-        // Verifica se os aeroportos de origem e destino são iguais
         if (originUpper.equals(destinationUpper)) {
             System.out.println("Origem e destino são iguais.");
             return;
         }
         // Verifica se o aeroporto de origem possui voos cadastrados
-        if (originAirport.getFlights().getTamanho() == 0) {
+        if (originAirportObject.getFlights().getTamanho() == 0) {
             System.out.println("Nenhum voo cadastrado para o aeroporto " + originUpper);
             return;
         }
 
-        // Criação de uma lista encadeada para armazenar o caminho atual e os aeroportos visitados
-        ListaEncadeadaSimplesDesordenada<String> currentRoute = new ListaEncadeadaSimplesDesordenada<>();
-        ListaEncadeadaSimplesDesordenada<String> visited = new ListaEncadeadaSimplesDesordenada<>();
+        // Criação da fila para armazenar os trajetos
+        Fila<ListaEncadeadaSimplesDesordenada<String>> queue = new Fila<>();
+        ListaEncadeadaSimplesDesordenada<String> visitedRoutes = new ListaEncadeadaSimplesDesordenada<>();
+        ListaEncadeadaSimplesDesordenada<String> initialRoute = new ListaEncadeadaSimplesDesordenada<>();
 
-        // Adiciona o aeroporto de origem à rota atual e aos visitados
-        currentRoute.guardeNoFinal(originUpper);
-        visited.guardeNoFinal(originUpper);
+        // Adiciona o codigo do aeroporto de origem ao trajeto inicial e aos visitados
+        initialRoute.guardeNoFinal(originUpper);
+        visitedRoutes.guardeNoFinal(originUpper);
+        
+        // Adiciona o trajeto inicial à fila
+        // Obs: o initialRoute é utilizado aqui para evitar erros ao manipular a visitedRoutes
+        queue.guardeUmItem(initialRoute);
 
-        // Chamar a função recursiva para buscar os voos indiretos
-        findIndirectFlights(originUpper, destinationUpper, currentRoute, visited);
+        boolean foundRoute = false;
 
-        // Se não encontrou nenhum trajeto
-        if (currentRoute.getTamanho() == 1) {
-            System.out.println("Nenhum caminho encontrado de " + originUpper + " para " + destinationUpper);
+        // Processa os trajetos na fila
+        while (!queue.isVazia()) {
+            // Recupera o trajeto atual da fila dando acesso ao código último aeroporto visitado
+            ListaEncadeadaSimplesDesordenada<String> currentRoute = queue.recupereUmItem();
+            // Remove o trajeto atual da fila
+            queue.removaUmItem();
+            // Recupera o último aeroporto do trajeto atual
+            String lastAirportInRoute = currentRoute.get(currentRoute.getTamanho() - 1);
+            // Encontra o aeroporto pelo código
+            Airport lastAirportObject = findAirport(lastAirportInRoute);
+
+            // Percorre cada voo do aeroporto atual
+            for (int i = 0; i < lastAirportObject.getFlights().getTamanho(); i++) {
+                // Recupera o voo atual, encontra o índice do aeroporto de destino e, com ele, o código do próximo aeroporto
+                Flight flightObject = lastAirportObject.getFlights().get(i);
+                int destinationIndex = flightObject.getDestinationIndex();
+                String nextAirportCode = airports.get(destinationIndex).getCode();
+
+                // Se o próximo aeroporto for o destino, exibe o trajeto completo
+                if (nextAirportCode.equals(destinationUpper)) {
+                    currentRoute.guardeNoFinal(nextAirportCode);
+                    System.out.println("Trajeto: " + currentRoute);
+                    // Remove o último aeroporto após exibir o trajeto para explorar outras rotas
+                    currentRoute.removaUltimo();
+                    foundRoute = true;
+                }
+
+                // Se o próximo aeroporto ainda não foi visitado, continua o processamento
+                if (!visitedRoutes.tem(nextAirportCode)) {
+                    // Adiciona o próximo aeroporto ao trajeto atual e aos visitados
+                    visitedRoutes.guardeNoFinal(nextAirportCode);
+                    // Clona o trajeto atual para criar um novo trajeto
+                    @SuppressWarnings("unchecked")
+                    ListaEncadeadaSimplesDesordenada<String> newRoute = (ListaEncadeadaSimplesDesordenada<String>) currentRoute
+                            .clone();
+                    // Adiciona o próximo aeroporto ao novo trajeto
+                    newRoute.guardeNoFinal(nextAirportCode);
+                    // Adiciona o novo trajeto à fila para processamento
+                    queue.guardeUmItem(newRoute);
+                }
+            }
         }
-    }
-
-    // Função recursiva para buscar voos com conexão (trajetos indiretos)
-    private void findIndirectFlights(String currentCode, String destinationCode,
-            ListaEncadeadaSimplesDesordenada<String> currentRoute, ListaEncadeadaSimplesDesordenada<String> visited)
-            throws Exception {
-
-        // Encontra o aeroporto atual pelo código
-        Airport currentAirport = findAirport(currentCode);
-
-        // Itera sobre os voos a partir do aeroporto atual
-        for (int i = 0; i < currentAirport.getFlights().getTamanho(); i++) {
-            Flight flight = currentAirport.getFlights().get(i); // Pega o voo atual
-            int destinationIndex = flight.getDestinationIndex(); // Pega o índice do aeroporto de destino
-            String nextAirportCode = airports.get(destinationIndex).getCode(); // Converte o índice de volta para o código do aeroporto
-
-            // Se o próximo aeroporto for o destino, exibe o trajeto completo
-            if (nextAirportCode.equals(destinationCode)) {
-                // Adiciona o aeroporto de destino ao trajeto atual
-                currentRoute.guardeNoFinal(nextAirportCode);
-                System.out.println("Trajeto: " + currentRoute);
-                // Remove o último aeroporto após exibir o trajeto
-                currentRoute.removaUltimo();
-            }
-
-            // Se o próximo aeroporto ainda não foi visitado, continua a busca recursivamente
-            if (!visited.tem(nextAirportCode)) {
-                // Adiciona o próximo aeroporto ao trajeto atual e aos visitados
-                visited.guardeNoFinal(nextAirportCode);
-                currentRoute.guardeNoFinal(nextAirportCode);
-
-                // Chama recursivamente para explorar a partir do próximo aeroporto
-                findIndirectFlights(nextAirportCode, destinationCode, currentRoute, visited);
-
-                // Remove o aeroporto atual do trajeto e dos visitados para explorar outras rotas
-                currentRoute.removaUltimo();
-                visited.removaUltimo();
-            }
+        // Se não encontrou nenhum trajeto
+        if (!foundRoute) {
+            System.out.println("Nenhum caminho encontrado de " + originUpper + " para " + destinationUpper);
         }
     }
 
