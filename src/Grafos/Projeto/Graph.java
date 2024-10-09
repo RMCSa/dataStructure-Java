@@ -63,7 +63,7 @@ public class Graph {
     }
 
     // 3. Remoção de um voo indicado pelo número
-    public void removeFlight(String origin, int number) throws Exception {
+    public void removeFlight(String origin, int number) throws Exception {//codigo do aeroporto de origem e numero do voo
         // Converte o código para maiúsculas por fim de padronização
         String originUpper = origin.toUpperCase();
 
@@ -79,7 +79,7 @@ public class Graph {
     }
 
     // 4. Listagem de voos de um aeroporto
-    public void listFlights(String origin) throws Exception {
+    public void listFlights(String origin) throws Exception { // codigo do aerooprto de origem
         String originUpper = origin.toUpperCase();
 
         // Verifica se o aeroporto de origem existe
@@ -90,8 +90,7 @@ public class Graph {
 
         int flightCount = originAirport.getFlights().getTamanho();
         if (flightCount == 0) {
-            System.out.println("\nNenhum voo cadastrado para o aeroporto " + originUpper);
-            return;
+            throw new Exception("\nNenhum voo cadastrado para o aeroporto " + originUpper);
         }
 
         System.out.println("\nVoos saindo de " + originAirport.getName() + ":");
@@ -208,7 +207,7 @@ public class Graph {
     }
 
     // buscar aeroporto pelo código
-    private Airport findAirport(String code) throws Exception {
+    private Airport  findAirport(String code) throws Exception { //codigo de aeroporto
         // Converte o código para maiúsculas por fim de padronização
         String codeUpper = code.toUpperCase();
 
@@ -353,10 +352,6 @@ public class Graph {
         graph.registerFlight("GRU", "GIG", 89);
         graph.registerFlight("GRU", "CNF", 102);
         graph.registerFlight("SSA", "CNF", 215);
-
-        graph.registerAirport("TESTE", "TST");
-        graph.registerAirport("TESTE2", "TST2");
-        graph.registerFlight("TST", "TST2", 500);
         
         graph.displayMenu();
     }
