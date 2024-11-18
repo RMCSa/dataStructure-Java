@@ -1,14 +1,15 @@
-package LinkedList.Desordenadas.ListaEncadeadaSimplesDesordenada;
+package LinkedList.Ordenadas.ListaEncadeadaSimplesOrdenada;
 
 import LinkedList.Clonador.Clonador;
+import LinkedList.Desordenadas.ListaEncadeadaSimplesDesordenada.ListaEncadeadaSimplesDesordenada;
 
 /**
  * authors: Rafael Moreira Cavalcante de Souza - 23333
  * Vitor Henrique Girio Paes - 23340
  * Marcelo Henrique Morello Manzo - 23326
- * 
  */
-public class ListaEncadeadaSimplesDesordenada<X> implements Cloneable {
+public class ListaEncadeadaSimplesOrdenada<X> implements Cloneable {
+
     private class No implements Cloneable {
         private X info;
         private No prox;
@@ -93,12 +94,42 @@ public class ListaEncadeadaSimplesDesordenada<X> implements Cloneable {
 
     private No primeiro = null;
 
-    public ListaEncadeadaSimplesDesordenada() {
-        // TODO Auto-generated constructor stub
+    public ListaEncadeadaSimplesOrdenada() {
+        // Construtor vazio
     }
 
     public boolean isVazia() {
         return this.primeiro == null;
+    }
+
+    // Método para inserir um item na lista de forma ordenada
+    public void guardeOrdenado(X i) throws Exception {
+        if (i == null)
+            throw new Exception("Informação Ausente");
+
+        No novoNo = new No(i);
+
+        // Se a lista estiver vazia, insere no início
+        if (this.primeiro == null || compare(i, this.primeiro.getInfo()) <= 0) {
+            novoNo.setProx(this.primeiro);
+            this.primeiro = novoNo;
+        } else {
+            No atual = this.primeiro;
+            while (atual.getProx() != null && compare(i, atual.getProx().getInfo()) > 0) {
+                atual = atual.getProx();
+            }
+            novoNo.setProx(atual.getProx());
+            atual.setProx(novoNo);
+        }
+    }
+
+    // Função para comparar dois elementos de tipo X, substitua pela lógica de
+    // comparação desejada
+    private int compare(X a, X b) {
+        // Aqui você deve definir como comparar os elementos.
+        // Pode ser, por exemplo, verificando se a é maior ou menor que b de alguma
+        // forma
+        return ((Comparable<X>) a).compareTo(b);
     }
 
     public void guardeNoInicio(X i) throws Exception {
@@ -121,33 +152,6 @@ public class ListaEncadeadaSimplesDesordenada<X> implements Cloneable {
 
             atual.setProx(new No(i));
         }
-    }
-
-    public void guardeEm(int posicao, X info) throws Exception {
-        if (this.primeiro == null)
-            throw new Exception("Nó Vazio");
-        if (info == null)
-            throw new Exception("Informação Ausente");
-        if (posicao < 0)
-            throw new Exception("Posição inválida");
-        if (posicao == 0) {
-            guardeNoInicio(info);
-            return;
-        }
-
-        No anterior = this.primeiro;
-        No atual = this.primeiro.getProx();
-        int indice = 1;
-        while (atual.getProx() != null && indice < posicao) {
-            anterior = atual;
-            atual = atual.getProx();
-            indice++;
-        }
-        if (indice < posicao)
-            throw new Exception("Posição inválida");
-
-        X inf = new Clonador<X>().clone(info);
-        anterior.setProx(new No(inf, atual));
     }
 
     public boolean tem(X i) throws Exception {
@@ -184,7 +188,6 @@ public class ListaEncadeadaSimplesDesordenada<X> implements Cloneable {
         return atual.getInfo();
     }
 
-    // Retornar o número de elementos
     public int getTamanho() {
         if (this.primeiro == null)
             return 0;
@@ -223,22 +226,6 @@ public class ListaEncadeadaSimplesDesordenada<X> implements Cloneable {
         return atual.getInfo();
     }
 
-    public X get(X item) throws Exception {
-        if (this.primeiro == null)
-            throw new Exception("Nó Vazio");
-        if (item == null)
-            throw new Exception("Informação Ausente");
-
-        No atual = this.primeiro;
-        while (atual != null && !atual.getInfo().equals(item)) {
-            atual = atual.getProx();
-        }
-        if (atual == null)
-            throw new Exception("Item não encontrado");
-
-        return atual.getInfo();
-    }
-
     public void removaPrimeiro() throws Exception {
         if (this.primeiro == null)
             throw new Exception("Nó nulo, nada a retirar");
@@ -268,41 +255,6 @@ public class ListaEncadeadaSimplesDesordenada<X> implements Cloneable {
         }
     }
 
-    public void remova(int posicao) throws Exception {
-        if (this.primeiro == null)
-            throw new Exception("Nó nulo, nada a retirar");
-        if (posicao < 0)
-            throw new Exception("Posição inválida");
-
-        if (posicao > getTamanho() - 1) {
-            throw new Exception("Posição Inexistente");
-        }
-        if (posicao == getTamanho() - 1) {
-            removaUltimo();
-            return;
-        }
-
-        if (posicao == 0) {
-            removaPrimeiro();
-            return;
-        }
-
-        No anterior = this.primeiro;
-        No atual = this.primeiro.getProx();
-        int indice = 1;
-
-        while (atual.getProx() != null && indice < posicao) {
-            anterior = atual;
-            atual = atual.getProx();
-            indice++;
-        }
-        if (indice < posicao)
-            throw new Exception("Posição inválida");
-        // Ao fim do While, o No Atual corresponde ao valor procurado na posição
-        // requerida
-        anterior.setProx(atual.getProx());
-    }
-
     public void remova(X item) throws Exception {
         if (this.primeiro == null)
             throw new Exception("Nó nulo, nada a retirar");
@@ -327,28 +279,12 @@ public class ListaEncadeadaSimplesDesordenada<X> implements Cloneable {
         anterior.setProx(atual.getProx());
     }
 
-    public void reverter() throws Exception {
-        if (this.primeiro == null || this.primeiro.getProx() == null)
-            return;
-
-        No anterior = null;
-        No atual = this.primeiro;
-        No proximo = this.primeiro.getProx();
-        while (proximo != null) {
-            atual.setProx(anterior);
-            anterior = atual;
-            atual = proximo;
-            proximo = proximo.getProx();
-        }
-        atual.setProx(anterior);
-        this.primeiro = atual;
-    }
-
     @Override
     public String toString() {
         if (this.primeiro == null)
             return "[]";
         String ret = "[";
+
         No atual = this.primeiro;
         while (atual != null) {
             ret += atual.getInfo();
@@ -357,22 +293,6 @@ public class ListaEncadeadaSimplesDesordenada<X> implements Cloneable {
             atual = atual.getProx();
         }
         ret += "]";
-        return ret;
-    }
-
-    @Override
-    public int hashCode() {
-        int ret = 777;
-
-        No atual = this.primeiro;
-
-        while (atual != null) {
-            ret = 13 * ret + atual.getInfo().hashCode();
-            atual = atual.getProx();
-        }
-
-        if (ret < 0)
-            ret = -ret;
         return ret;
     }
 
@@ -385,7 +305,7 @@ public class ListaEncadeadaSimplesDesordenada<X> implements Cloneable {
             return false;
 
         No atualDoThis = this.primeiro;
-        No atualDoObj = ((ListaEncadeadaSimplesDesordenada<X>) obj).primeiro;
+        No atualDoObj = ((ListaEncadeadaSimplesOrdenada<X>) obj).primeiro;
 
         while (atualDoThis != null && atualDoObj != null) {
             if (!atualDoThis.getInfo().equals(atualDoObj.getInfo()))
@@ -393,13 +313,11 @@ public class ListaEncadeadaSimplesDesordenada<X> implements Cloneable {
             atualDoThis = atualDoThis.getProx();
             atualDoObj = atualDoObj.getProx();
         }
-        if (atualDoThis != null || atualDoObj != null)
-            return false;
 
-        return true;
+        return (atualDoThis == null && atualDoObj == null);
     }
 
-    public ListaEncadeadaSimplesDesordenada(ListaEncadeadaSimplesDesordenada<X> model) throws Exception {
+    public ListaEncadeadaSimplesOrdenada(ListaEncadeadaSimplesOrdenada<X> model) throws Exception {
         if (model == null)
             throw new Exception("Modelo Ausente");
 
@@ -422,11 +340,11 @@ public class ListaEncadeadaSimplesDesordenada<X> implements Cloneable {
 
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
     public Object clone() {
-        ListaEncadeadaSimplesDesordenada ret = null;
+        ListaEncadeadaSimplesOrdenada ret = null;
         try {
-            ret = new ListaEncadeadaSimplesDesordenada(this);
+            ret = new ListaEncadeadaSimplesOrdenada(this);
         } catch (Exception error) {
         }
         return ret;

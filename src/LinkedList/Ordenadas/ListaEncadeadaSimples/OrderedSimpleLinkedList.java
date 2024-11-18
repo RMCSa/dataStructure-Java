@@ -1,4 +1,4 @@
-package LinkedList.Ordenadas.ListaEncadeadaSimplesOrdenada;
+package LinkedList.Ordenadas.ListaEncadeadaSimples;
 import LinkedList.Clonador.Clonador;
 /**
  * author: Rafael Moreira Cavalcante de Souza - 23333
