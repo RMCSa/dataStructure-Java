@@ -1,39 +1,36 @@
 package Grafos;
 
-public class Aresta<T> {
-    private Vertice<T> origem;
-    private Vertice<T> destino;
-    private double peso; 
+public class Aresta<X> {
+    private X destino; // Destino da aresta
+    private int numero; // Identificador da aresta
 
-    public Aresta(Vertice<T> origem, Vertice<T> destino) {
-        this(origem, destino, 1.0); 
-    }
-
-    public Aresta(Vertice<T> origem, Vertice<T> destino, double peso) {
-        this.origem = origem;
+    public Aresta(X destino, int numero) {
         this.destino = destino;
-        this.peso = peso;
+        this.numero = numero;
     }
 
-    public Vertice<T> getOrigem() {
-        return origem;
-    }
-
-    public Vertice<T> getDestino() {
+    public X getDestino() {
         return destino;
     }
 
-    public double getPeso() {
-        return peso;
+    public void setDestino(X destino) {
+        this.destino = destino;
     }
 
-    public void setPeso(double peso) {
-        this.peso = peso;
+    public int getNumero() {
+        return numero;
+    }
+
+    public void setNumero(int numero) {
+        this.numero = numero;
     }
 
     @Override
     public String toString() {
-        return origem + " -> " + destino + " (peso: " + peso + ")";
+        return "Aresta{" +
+                "destino=" + destino +
+                ", numero=" + numero +
+                '}';
     }
 
     @Override
@@ -43,25 +40,15 @@ public class Aresta<T> {
         if (obj == null || getClass() != obj.getClass())
             return false;
 
-        Aresta<T> aresta = (Aresta<T>) obj;
-
-        if (Double.compare(aresta.peso, peso) != 0)
-            return false;
-        if (!origem.equals(aresta.origem))
-            return false;
-            
-        return destino.equals(aresta.destino);
+        Aresta<?> aresta = (Aresta<?>) obj;
+        return numero == aresta.numero && destino.equals(aresta.destino);
     }
 
     @Override
     public int hashCode() {
         int ret = 777;
-        
-        ret = 7 * ret + origem.hashCode();
         ret = 7 * ret + destino.hashCode();
-        ret = 7 * ret + Double.hashCode(peso);
-
-        if (ret < 0) ret = -ret;
-        return ret;
+        ret = 7 * ret + Integer.valueOf(numero).hashCode();
+        return ret >= 0 ? ret : -ret;
     }
 }

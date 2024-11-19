@@ -1,4 +1,4 @@
-package LinkedList.Ordenadas.ListaEncadeadaSimplesOrdenada;
+package LinkedList.Ordenadas.ListaEncadeadaSimples;
 
 
 
