@@ -1,4 +1,4 @@
-package Grafos.Projeto;
+package Grafos.ProjetoGenerico;
 /**
  * authors: Rafael Moreira Cavalcante de Souza - 23333
  * Vitor Henrique Girio Paes - 23340
@@ -8,45 +8,45 @@ package Grafos.Projeto;
 import LinkedList.Desordenadas.ListaDuplamenteLigadaDesordenada.ListaDuplamenteLigadaDesordenada;
 
 // Estruturado como um Vértice, não genérico, para atender às necessidades específicas do projeto
-public class Airport {
-    private String name;
-    private String code;
-    private ListaDuplamenteLigadaDesordenada<Flight> flights;
+public class Vertice<X> {
+    private X name;
+    private X code;
+    private ListaDuplamenteLigadaDesordenada<Aresta<X>> flights;
 
-    public Airport(String name, String code) {
-        this.name = name.toUpperCase();
-        this.code = code.toUpperCase();
+    public Vertice(X name, X code) {
+        this.name = name;
+        this.code = code;
         this.flights = new ListaDuplamenteLigadaDesordenada<>();
     }
 
-    public String getName() {
+    public X getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(X name) {
         this.name = name;
     }
 
-    public String getCode() {
+    public X getCode() {
         return code;
     }
 
-    public void setCode(String code) {
+    public void setCode(X code) {
         this.code = code;
     }
 
-    public ListaDuplamenteLigadaDesordenada<Flight> getFlights() {
+    public ListaDuplamenteLigadaDesordenada<Aresta<X>> getFlights() {
         return flights;
     }
 
-    public void addFlight(Flight flight) throws Exception {
+    public void addFlight(Aresta<X> flight) throws Exception {
         if (flight == null) {
             throw new Exception("Flight is null.");
         }
         flights.guardeNoFinal(flight);
     }
 
-    public void removeFlight(Flight flight) throws Exception {
+    public void removeFlight(Aresta<X> flight) throws Exception {
         if (flight == null) {
             throw new Exception("Flight is null.");
         }
@@ -54,20 +54,21 @@ public class Airport {
     }
 
     public void removeFlight(int number) throws Exception {
-        Flight flight = findFlight(number);
+        Aresta<X> flight = findFlight(number);
         if (flight == null) {
             throw new Exception("Flight not found.");
         }
         flights.remova(flight);
     }
 
-    private Flight findFlight(int number) throws Exception {
+    private Aresta<X> findFlight(int number) throws Exception {
         for (int i = 0; i < flights.getTamanho(); i++) {
-            Flight flight = flights.get(i);
-            if (flight.getNumber() == number) {
+            Aresta<X> flight = flights.get(i);
+            if (flight.getNumber().equals(number)) {
                 return flight;
             }
         }
+
         return null;
     }
 
@@ -78,7 +79,7 @@ public class Airport {
         }
 
         for (int i = 0; i < flights.getTamanho(); i++) {
-            Flight flight = flights.get(i);
+            Aresta<X> flight = flights.get(i);
             System.out.println("Flight " + flight.getNumber() + " -> " + flight.getDestinationIndex());
         }
     }
@@ -90,7 +91,7 @@ public class Airport {
         if (obj == null || getClass() != obj.getClass())
             return false;
 
-        Airport airport = (Airport) obj;
+        Vertice airport = (Vertice) obj;
         return code.equals(airport.code) && name.equals(airport.name);
     }
 

@@ -98,8 +98,7 @@ public class Graph {
 
         int flightCount = originAirport.getFlights().getTamanho();
         if (flightCount == 0) {
-            System.out.println("\nNenhum voo cadastrado para o aeroporto " + originUpper);
-            return;
+            throw new Exception("Nenhum voo cadastrado para o aeroporto " + originUpper);
         }
 
         System.out.println("\nVoos saindo de " + originAirport.getName() + ":");
@@ -361,10 +360,6 @@ public class Graph {
         graph.registerFlight("GRU", "GIG", 89);
         graph.registerFlight("GRU", "CNF", 102);
         graph.registerFlight("SSA", "CNF", 215);
-
-        graph.registerAirport("TESTE", "TST");
-        graph.registerAirport("TESTE2", "TST2");
-        graph.registerFlight("TST", "TST2", 500);
         
         graph.displayMenu();
     }
