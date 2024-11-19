@@ -30,8 +30,22 @@ public class HashMap<K, V> {
                 return false;
             if (getClass() != obj.getClass())
                 return false;
-            final Elemento other = (Elemento) obj;
-            return this.chave.equals(other.chave);
+            Elemento other = (Elemento) obj;
+
+            if (other.chave != this.chave || other.valor != this.valor)
+                return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int ret = 777;
+
+            ret += 13 * ret + chave.hashCode();
+            ret += 13 * ret + valor.hashCode();
+
+            return ret < 0 ? -ret : ret;
         }
 
         @Override
@@ -40,7 +54,7 @@ public class HashMap<K, V> {
         }
     }
 
-    private ListaEncadeadaSimplesDesordenada<Elemento>[] tabela;
+    private ListaEncadeadaSimplesDesordenada<Elemento>[] vetor;
     private int qtdElems = 0;
     private int capacidadeInicial;
     private float txMinDesperdicio, txMaxDesperdicio;
@@ -50,7 +64,7 @@ public class HashMap<K, V> {
         this.capacidadeInicial = capacidadeInicial;
         this.txMinDesperdicio = txMinDesperdicio;
         this.txMaxDesperdicio = txMaxDesperdicio;
-        this.tabela = new ListaEncadeadaSimplesDesordenada[capacidadeInicial];
+        this.vetor = new ListaEncadeadaSimplesDesordenada[capacidadeInicial];
     }
 
     // Construtor alternativo com taxas padrão
@@ -59,7 +73,11 @@ public class HashMap<K, V> {
     }
 
     private int calcularIndice(K chave) {
-        return Math.abs(chave.hashCode()) % capacidadeInicial;
+        int ret = chave.hashCode();
+        if (ret < 0) {
+            ret = -ret;
+        }
+        return ret % capacidadeInicial;
     }
 
     private void verificarTaxaEDimensionar() {
@@ -68,18 +86,24 @@ public class HashMap<K, V> {
         if (taxaOcupacao > txMaxDesperdicio) {
             redimensionar(capacidadeInicial * 2); // Aumenta o tamanho
         } else if (taxaOcupacao < txMinDesperdicio && capacidadeInicial > 1) {
-            redimensionar(Math.max(capacidadeInicial / 2, 1)); // Diminui o tamanho, mas não abaixo de 1
+            int novaCapacidade = capacidadeInicial / 2;
+            if (novaCapacidade < 1) {
+                novaCapacidade = 1;
+            }
+            redimensionar(novaCapacidade); // Diminui o tamanho, mas não abaixo de 1
+                                                                               // capacidadeInicial
         }
     }
 
     private void redimensionar(int novaCapacidade) {
         ListaEncadeadaSimplesDesordenada<Elemento>[] novaTabela = new ListaEncadeadaSimplesDesordenada[novaCapacidade];
-        for (ListaEncadeadaSimplesDesordenada<Elemento> lista : tabela) {
+        for (ListaEncadeadaSimplesDesordenada<Elemento> lista : vetor) {
             if (lista != null) {
                 for (int i = 0; i < lista.getTamanho(); i++) {
                     try {
                         Elemento elemento = lista.get(i);
-                        int novoIndice = Math.abs(elemento.getChave().hashCode()) % novaCapacidade;
+                        int hash = elemento.getChave().hashCode();
+                        int novoIndice = hash < 0 ? -hash : hash % novaCapacidade;
                         if (novaTabela[novoIndice] == null) {
                             novaTabela[novoIndice] = new ListaEncadeadaSimplesDesordenada<>();
                         }
@@ -90,7 +114,7 @@ public class HashMap<K, V> {
                 }
             }
         }
-        tabela = novaTabela;
+        vetor = novaTabela;
         capacidadeInicial = novaCapacidade;
     }
 
@@ -98,22 +122,20 @@ public class HashMap<K, V> {
         if (chave == null) {
             throw new Exception("Chave não pode ser nula");
         }
-        
 
         int indice = calcularIndice(chave);
 
-        if (tabela[indice] == null) {
-            tabela[indice] = new ListaEncadeadaSimplesDesordenada<>();
+        if (vetor[indice] == null) {
+            vetor[indice] = new ListaEncadeadaSimplesDesordenada<>();
         }
 
-        ListaEncadeadaSimplesDesordenada<Elemento> lista = tabela[indice];
+        ListaEncadeadaSimplesDesordenada<Elemento> lista = vetor[indice];
         Elemento novoElemento = new Elemento(chave, valor);
 
         for (int i = 0; i < lista.getTamanho(); i++) {
             Elemento atual = lista.get(i);
             if (atual.getChave().equals(chave)) {
-                atual.setValor(valor);
-                return;
+                throw new Exception("Chave repetida! Não é possível adicionar um item com chave já existente.");
             }
         }
 
@@ -128,7 +150,7 @@ public class HashMap<K, V> {
         }
 
         int indice = calcularIndice(chave);
-        ListaEncadeadaSimplesDesordenada<Elemento> lista = tabela[indice];
+        ListaEncadeadaSimplesDesordenada<Elemento> lista = vetor[indice];
 
         if (lista != null) {
             for (int i = 0; i < lista.getTamanho(); i++) {
@@ -144,7 +166,7 @@ public class HashMap<K, V> {
 
     public void removaUmItem(K chave) throws Exception {
         int indice = calcularIndice(chave);
-        ListaEncadeadaSimplesDesordenada<Elemento> lista = tabela[indice];
+        ListaEncadeadaSimplesDesordenada<Elemento> lista = vetor[indice];
 
         if (lista != null) {
             for (int i = 0; i < lista.getTamanho(); i++) {
@@ -161,13 +183,30 @@ public class HashMap<K, V> {
         throw new Exception("Item não encontrado");
     }
 
+    public void altereUmItem(K chave, V novoValor) throws Exception {
+        int indice = calcularIndice(chave);
+        ListaEncadeadaSimplesDesordenada<Elemento> lista = vetor[indice];
+
+        if (lista != null) {
+            for (int i = 0; i < lista.getTamanho(); i++) {
+                Elemento atual = lista.get(i);
+                if (atual.getChave().equals(chave)) {
+                    atual.setValor(novoValor);
+                    return;
+                }
+            }
+        }
+
+        throw new Exception("Item não encontrado");
+    }
+
     public K recupereUmaChave(int index) throws Exception {
         if (index < 0 || index >= qtdElems) {
             throw new Exception("Índice fora dos limites");
         }
 
         int currentIndex = 0;
-        for (ListaEncadeadaSimplesDesordenada<Elemento> lista : tabela) {
+        for (ListaEncadeadaSimplesDesordenada<Elemento> lista : vetor) {
             if (lista != null) {
                 for (int i = 0; i < lista.getTamanho(); i++) {
                     if (currentIndex == index) {
@@ -190,7 +229,7 @@ public class HashMap<K, V> {
         StringBuilder sb = new StringBuilder();
         sb.append("{");
 
-        for (ListaEncadeadaSimplesDesordenada<Elemento> lista : tabela) {
+        for (ListaEncadeadaSimplesDesordenada<Elemento> lista : vetor) {
             if (lista != null) {
                 for (int i = 0; i < lista.getTamanho(); i++) {
                     try {
@@ -203,8 +242,6 @@ public class HashMap<K, V> {
             }
         }
 
-        if (sb.length() > 1)
-            sb.setLength(sb.length() - 2); // Remove a última vírgula
         sb.append("}");
         return sb.toString();
     }
@@ -219,34 +256,15 @@ public class HashMap<K, V> {
             mapa.guardeUmItem("Bob", 30);
             mapa.guardeUmItem("Charlie", 35);
 
-            // Recuperando elementos
-            System.out.println("Valor associado a 'Alice': " + mapa.recupereUmItem("Alice"));
-            System.out.println("Valor associado a 'Bob': " + mapa.recupereUmItem("Bob"));
-            System.out.println("Valor associado a 'Charlie': " + mapa.recupereUmItem("Charlie"));
-
-            // Atualizando valor de um elemento existente
-            mapa.guardeUmItem("Bob", 40);
-            System.out.println("Valor atualizado associado a 'Bob': " + mapa.recupereUmItem("Bob"));
-
-            // Removendo um elemento
-            mapa.removaUmItem("Charlie");
-            System.out.println("Elemento 'Charlie' removido com sucesso.");
-
-            // Tentando recuperar um elemento removido (deve lançar uma exceção)
+            // Tentando adicionar uma chave repetida
             try {
-                System.out.println(mapa.recupereUmItem("Charlie"));
+                mapa.guardeUmItem("Alice", 40); // Deve lançar exceção
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
 
             // Exibindo o conteúdo do HashMap
             System.out.println("Conteúdo do HashMap: " + mapa.toString());
-
-            // Testando redimensionamento
-            for (int i = 0; i < 20; i++) {
-                mapa.guardeUmItem("Chave" + i, i * 10);
-            }
-            System.out.println("Conteúdo do HashMap após redimensionamento: " + mapa.toString());
 
         } catch (Exception e) {
             e.printStackTrace();
