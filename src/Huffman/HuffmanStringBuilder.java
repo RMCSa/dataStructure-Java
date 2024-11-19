@@ -3,6 +3,7 @@ package Huffman;
 import java.io.RandomAccessFile;
 import HashMap.HashMap;
 import LinkedList.Ordenadas.ListaEncadeadaSimplesOrdenada.ListaEncadeadaSimplesOrdenada;
+import Pilhas.ComListaEncadeada.Pilha;
 
 public class HuffmanStringBuilder {
     private HashMap<Character, String> codes;
@@ -108,7 +109,7 @@ public class HuffmanStringBuilder {
         RandomAccessFile inputFile = new RandomAccessFile(inputFilePath, "r");
         RandomAccessFile outputFile = new RandomAccessFile(outputFilePath, "rw");
 
-        // Passo 1: Contando frequência dos caracteres...
+        // Contando a freq do char
         System.out.println("Contando frequência dos caracteres...");
         HashMap<Character, Integer> frequenciaMap = new HashMap<>(10);
         int character;
@@ -125,16 +126,15 @@ public class HuffmanStringBuilder {
 
         System.out.println("Construindo a árvore de Huffman...");
         construitArvoreHuffman(frequenciaMap);
-        System.out.println("Árvore de Huffman construída");
 
         System.out.println("Gerando códigos de Huffman...");
         gerarCodigos(listaOrdenada.getPrimeiro(), "");
         System.out.println("Códigos gerados: " + codes.toString());
 
-        // Passo 4: Escrever a árvore de Huffman no arquivo
+        // Salva árvore de Huffman no arquivo
         salvarArvore(outputFile, listaOrdenada.getPrimeiro());
 
-        // Passo 5: Escrever o número de bits significativos
+        // Salvar no arquivo apenas os bits necessários
         inputFile.seek(0);
 
         StringBuilder compactarData = new StringBuilder();
@@ -145,7 +145,7 @@ public class HuffmanStringBuilder {
         int bitsImportantes = compactarData.length();
         outputFile.writeInt(bitsImportantes);
 
-        // Passo 6: Escrever os dados codificados no arquivo
+        // Escrever os dados codificados no arquivo
         salvarDados(outputFile, compactarData.toString());
 
         inputFile.close();
@@ -157,28 +157,28 @@ public class HuffmanStringBuilder {
         RandomAccessFile inputFile = new RandomAccessFile(inputFilePath, "r");
         RandomAccessFile outputFile = new RandomAccessFile(outputFilePath, "rw");
 
-        // Passo 1: Reconstruir a árvore de Huffman a partir do arquivo
+        // Reconstruir a árvore de Huffman a partir do arquivo
         No root = recuperarArvore(inputFile);
 
-        // Passo 2: Ler o número de bits significativos
+        // Ler o número de bits necessários
         int bitsImportantes = inputFile.readInt();
 
-        // Passo 3: Ler os dados codificados
+        // Ler os dados codificados
         StringBuilder compactarData = new StringBuilder();
         int character;
         while ((character = inputFile.read()) != -1) {
             String byteString = Integer.toBinaryString(character & 0xFF);
-            // Completa a string binária com zeros à esquerda até ter 8 bits
+            // Completa a str binária 
             while (byteString.length() < 8) {
                 byteString = "0" + byteString;
             }
             compactarData.append(byteString);
         }
 
-        // Truncar para o número de bits significativos
+        // Cortar a string para o número de bits que realmente serão utilizados
         compactarData.setLength(bitsImportantes);
 
-        // Passo 4: Decodificar os dados usando a árvore de Huffman
+        // Decodificar os dados 
         No currentNode = root;
         StringBuilder descompactarData = new StringBuilder();
         for (int i = 0; i < compactarData.length(); i++) {
@@ -224,7 +224,7 @@ public class HuffmanStringBuilder {
             listaOrdenada.guardeOrdenado(parent);
         }
 
-        System.out.println("Construção da árvore de Huffman concluída.");
+        System.out.println("Árvore de Huffman concluída.");
     }
 
     // Método para gerar códigos de Huffman
@@ -238,26 +238,37 @@ public class HuffmanStringBuilder {
     }
 
     // Método para escrever a árvore de Huffman no arquivo
-    private void salvarArvore(RandomAccessFile file, No node) throws Exception {
-        if (node.ehFolha()) {
-            file.writeBoolean(true); // Indica que é uma folha
-            file.writeChar(node.charactere); // Escreve o caractere
-            return;
+    private void salvarArvore(RandomAccessFile file, No root) throws Exception {
+        Pilha<No> pilha = new Pilha<>();
+        pilha.guardeUmItem(root);
+
+        while (!pilha.isVazia()) {
+            No node = pilha.recupereUmItem();
+            pilha.removaUmItem();
+
+            if (node.ehFolha()) {
+                file.writeBoolean(true); // pra indicar que é folha
+                file.writeChar(node.charactere); // Escreve o caractere
+            } else {
+                file.writeBoolean(false);
+                if (node.dir != null) {
+                    pilha.guardeUmItem(node.dir);
+                }
+                if (node.esq != null) {
+                    pilha.guardeUmItem(node.esq);
+                }
+            }
         }
-        file.writeBoolean(false); // Indica que é um nó intermediário
-        salvarArvore(file, node.esq);
-        salvarArvore(file, node.dir);
     }
 
-    // Método para reconstruir a árvore de Huffman a partir do arquivo
+    // Reconstruir a árvore de Huffman a partir do arquivo
     private No recuperarArvore(RandomAccessFile file) throws Exception {
         if (file.readBoolean()) { // Se for uma folha
-            return new No(file.readChar(), 0); // Retorna o nó folha com o caractere (a frequência não é relevante
-                                               // aqui)
+            return new No(file.readChar(), 0); // Retorna o nó folha com o caractere
         } else {
-            No esq = recuperarArvore(file); // Reconstrói a subárvore esquerda
-            No dir = recuperarArvore(file); // Reconstrói a subárvore direita
-            return new No(0, esq, dir); // Cria um nó intermediário (a frequência não é usada na decodificação)
+            No esq = recuperarArvore(file); // Reconstrói as subárvores 
+            No dir = recuperarArvore(file); 
+            return new No(0, esq, dir); // Cria um nó intermediário 
         }
     }
 

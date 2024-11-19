@@ -2,9 +2,9 @@ package Huffman;
 public class Main {
     public static void main(String[] args) {
         try {
-            String inputFilePath = "C:\\Users\\Rafael\\Documents\\GitHub\\dataStructure-Java\\src\\Huffman\\files\\original.txt";
-            String encodedFilePath = "C:\\Users\\Rafael\\Documents\\GitHub\\dataStructure-Java\\src\\Huffman\\files\\arquivo_codificado.bin";
-            String decodedFilePath = "C:\\Users\\Rafael\\Documents\\GitHub\\dataStructure-Java\\src\\Huffman\\files\\arquivo_decodificado.txt";
+            String inputFilePath = "/Users/u23333/GitHub/dataStructure-Java/src/Huffman/files/original.txt";
+            String encodedFilePath = "/Users/u23333/GitHub/dataStructure-Java/src/Huffman/files/arquivo_codificado.bin";
+            String decodedFilePath = "/Users/u23333/GitHub/dataStructure-Java/src/Huffman/files/arquivo_decodificado.txt";
 
             //  Codificar
             System.out.println("Codificando o arquivo...");

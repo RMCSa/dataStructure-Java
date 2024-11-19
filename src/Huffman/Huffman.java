@@ -103,37 +103,32 @@ public class Huffman {
 
     // Método para codificar um arquivo
     public void compactar(String inputFilePath, String outputFilePath) throws Exception {
-        System.out.println("Iniciando processo de codificação...");
         RandomAccessFile inputFile = new RandomAccessFile(inputFilePath, "r");
         RandomAccessFile outputFile = new RandomAccessFile(outputFilePath, "rw");
 
-        // Passo 1: Contando frequência dos caracteres...
-        System.out.println("Contando frequência dos caracteres...");
+        System.out.println("freq dos caracteres");
         HashMap<Character, Integer> frequenciaMap = new HashMap<>(10);
         int character;
         while ((character = inputFile.read()) != -1) {
             char ch = (char) character;
             try {
                 int freq = frequenciaMap.recupereUmItem(ch);
-                frequenciaMap.guardeUmItem(ch, freq + 1); // Atualizando a frequência
+                frequenciaMap.guardeUmItem(ch, freq + 1); 
             } catch (Exception e) {
-                frequenciaMap.guardeUmItem(ch, 1); // Inserindo novo caractere
+                frequenciaMap.guardeUmItem(ch, 1);
             }
         }
         System.out.println("Frequências: " + frequenciaMap.toString());
 
-        System.out.println("Construindo a árvore de Huffman...");
+        System.out.println("árvore de Huffman");
         construitArvoreHuffman(frequenciaMap);
-        System.out.println("Árvore de Huffman construída");
 
-        System.out.println("Gerando códigos de Huffman...");
+        System.out.println("códigos de Huffman...");
         gerarCodigos(listaOrdenada.getPrimeiro(), "");
         System.out.println("Códigos gerados: " + codes.toString());
 
-        // Passo 4: Escrever a árvore de Huffman no arquivo
         salvarArvore(outputFile, listaOrdenada.getPrimeiro());
 
-        // Passo 5: Escrever o número de bits significativos
         inputFile.seek(0);
 
         String compactarData = "";
@@ -144,24 +139,21 @@ public class Huffman {
         int bitsImportantes = compactarData.length();
         outputFile.writeInt(bitsImportantes);
 
-        // Passo 6: Escrever os dados codificados no arquivo
         salvarDados(outputFile, compactarData.toString());
 
         inputFile.close();
         outputFile.close();
     }
-    // Método para decodificar um arquivo
+
+
     public void descompactar(String inputFilePath, String outputFilePath) throws Exception {
         RandomAccessFile inputFile = new RandomAccessFile(inputFilePath, "r");
         RandomAccessFile outputFile = new RandomAccessFile(outputFilePath, "rw");
 
-        // Passo 1: Reconstruir a árvore de Huffman a partir do arquivo
         No root = recuperarArvore(inputFile);
 
-        // Passo 2: Ler o número de bits significativos
         int bitsImportantes = inputFile.readInt();
 
-        // Passo 3: Ler os dados codificados
         String compactarData = "";
         int character;
         while ((character = inputFile.read()) != -1) {
@@ -169,10 +161,8 @@ public class Huffman {
             compactarData += byteString;
         }
 
-        // Truncar para o número de bits significativos
         compactarData = compactarData.substring(0, bitsImportantes);
 
-        // Passo 4: Decodificar os dados usando a árvore de Huffman
         No currentNode = root;
         String descompactarData = "";
         for (int i = 0; i < compactarData.length(); i++) {
@@ -194,7 +184,6 @@ public class Huffman {
     private void construitArvoreHuffman(HashMap<Character, Integer> frequenciaMap) throws Exception {
         System.out.println("Iniciando construção da árvore de Huffman...");
 
-        // Criar nós para cada caractere com base na frequência
         for (int i = 0; i < frequenciaMap.getTamanho(); i++) {
             Character character = frequenciaMap.recupereUmaChave(i);
             int frequencia = frequenciaMap.recupereUmItem(character);
@@ -202,7 +191,6 @@ public class Huffman {
             listaOrdenada.guardeOrdenado(new No(character, frequencia));
         }
 
-        // Combinar nós para formar a árvore de Huffman
         while (listaOrdenada.getTamanho() > 1) {
             No esq = listaOrdenada.getPrimeiro();
             listaOrdenada.removaPrimeiro();
@@ -230,14 +218,15 @@ public class Huffman {
         gerarCodigos(node.esq, code + "0");
         gerarCodigos(node.dir, code + "1");
     }
+
     // Método para escrever a árvore de Huffman no arquivo
     private void salvarArvore(RandomAccessFile file, No node) throws Exception {
         if (node.ehFolha()) {
-            file.writeBoolean(true); // Indica que é uma folha
-            file.writeChar(node.charactere); // Escreve o caractere
+            file.writeBoolean(true); 
+            file.writeChar(node.charactere); 
             return;
         }
-        file.writeBoolean(false); // Indica que é um nó intermediário
+        file.writeBoolean(false); 
         salvarArvore(file, node.esq);
         salvarArvore(file, node.dir);
     }
@@ -245,8 +234,7 @@ public class Huffman {
     // Método para reconstruir a árvore de Huffman a partir do arquivo
     private No recuperarArvore(RandomAccessFile file) throws Exception {
         if (file.readBoolean()) { // Se for uma folha
-            return new No(file.readChar(), 0); // Retorna o nó folha com o caractere (a frequência não é relevante
-                                                 // aqui)
+            return new No(file.readChar(), 0); // Retorna o nó folha com o caractere (a frequência não é relevante na decodificação)
         } else {
             No esq = recuperarArvore(file); // Reconstrói a subárvore esquerda
             No dir = recuperarArvore(file); // Reconstrói a subárvore direita
