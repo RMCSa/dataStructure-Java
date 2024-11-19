@@ -95,13 +95,13 @@ public class Huffman {
             return this.frequencia - o.frequencia;
         }
     }
-    // Construtor
+
     public Huffman() {
         this.codes = new HashMap<>(10);
         this.listaOrdenada = new ListaEncadeadaSimplesOrdenada<>();
     }
 
-    // Método para codificar um arquivo
+    // Codificar um arquivo
     public void compactar(String inputFilePath, String outputFilePath) throws Exception {
         RandomAccessFile inputFile = new RandomAccessFile(inputFilePath, "r");
         RandomAccessFile outputFile = new RandomAccessFile(outputFilePath, "rw");
@@ -180,7 +180,7 @@ public class Huffman {
         outputFile.close();
     }
 
-    // Método para construir a árvore de Huffman
+    // Construir a árvore de Huffman
     private void construitArvoreHuffman(HashMap<Character, Integer> frequenciaMap) throws Exception {
         System.out.println("Iniciando construção da árvore de Huffman...");
 
@@ -209,7 +209,7 @@ public class Huffman {
         System.out.println("Construção da árvore de Huffman concluída.");
     }
 
-    // Método para gerar códigos de Huffman
+    // Códigos de Huffman
     private void gerarCodigos(No node, String code) throws Exception {
         if (node.ehFolha()) {
             codes.guardeUmItem(node.charactere, code);
@@ -219,7 +219,7 @@ public class Huffman {
         gerarCodigos(node.dir, code + "1");
     }
 
-    // Método para escrever a árvore de Huffman no arquivo
+    // Escrever a árvore de Huffman no arquivo
     private void salvarArvore(RandomAccessFile file, No node) throws Exception {
         if (node.ehFolha()) {
             file.writeBoolean(true); 
@@ -231,18 +231,18 @@ public class Huffman {
         salvarArvore(file, node.dir);
     }
 
-    // Método para reconstruir a árvore de Huffman a partir do arquivo
+    // Reconstruir a árvore de Huffman a partir do arquivo
     private No recuperarArvore(RandomAccessFile file) throws Exception {
         if (file.readBoolean()) { // Se for uma folha
             return new No(file.readChar(), 0); // Retorna o nó folha com o caractere (a frequência não é relevante na decodificação)
         } else {
-            No esq = recuperarArvore(file); // Reconstrói a subárvore esquerda
-            No dir = recuperarArvore(file); // Reconstrói a subárvore direita
+            No esq = recuperarArvore(file); 
+            No dir = recuperarArvore(file); 
             return new No(0, esq, dir); // Cria um nó intermediário (a frequência não é usada na decodificação)
         }
     }
 
-    // Método para escrever os dados codificados no arquivo
+    // Escrever os dados codificados 
     private void salvarDados(RandomAccessFile file, String data) throws Exception {
         for (int i = 0; i < data.length(); i += 8) {
             String byteString;

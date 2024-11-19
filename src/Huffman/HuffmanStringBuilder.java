@@ -105,12 +105,12 @@ public class HuffmanStringBuilder {
 
     // Método para codificar um arquivo
     public void compactar(String inputFilePath, String outputFilePath) throws Exception {
-        System.out.println("Iniciando processo de codificação...");
+        System.out.println("Iniciando processo de codificação");
         RandomAccessFile inputFile = new RandomAccessFile(inputFilePath, "r");
         RandomAccessFile outputFile = new RandomAccessFile(outputFilePath, "rw");
 
         // Contando a freq do char
-        System.out.println("Contando frequência dos caracteres...");
+        System.out.println("Frequência dos caracteres");
         HashMap<Character, Integer> frequenciaMap = new HashMap<>(10);
         int character;
         while ((character = inputFile.read()) != -1) {
@@ -124,10 +124,10 @@ public class HuffmanStringBuilder {
         }
         System.out.println("Frequências: " + frequenciaMap.toString());
 
-        System.out.println("Construindo a árvore de Huffman...");
+        System.out.println("Construindo a árvore de Huffman");
         construitArvoreHuffman(frequenciaMap);
 
-        System.out.println("Gerando códigos de Huffman...");
+        System.out.println("Gerando códigos de Huffman");
         gerarCodigos(listaOrdenada.getPrimeiro(), "");
         System.out.println("Códigos gerados: " + codes.toString());
 
@@ -136,7 +136,6 @@ public class HuffmanStringBuilder {
 
         // Salvar no arquivo apenas os bits necessários
         inputFile.seek(0);
-
         StringBuilder compactarData = new StringBuilder();
         while ((character = inputFile.read()) != -1) {
             char ch = (char) character;
@@ -287,4 +286,34 @@ public class HuffmanStringBuilder {
             file.writeByte((byte) Integer.parseInt(byteString, 2));
         }
     }
+
+    @Override
+    public String toString() {
+        return "HuffmanStringBuilder{" +
+                "codes=" + codes +
+                ", listaOrdenada=" + listaOrdenada +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final HuffmanStringBuilder other = (HuffmanStringBuilder) obj;
+        return this.codes.equals(other.codes) && this.listaOrdenada.equals(other.listaOrdenada);
+    }
+
+    @Override
+    public int hashCode() {
+        int ret = 777;
+
+        ret += 7 * codes.hashCode();
+        ret += 7 * listaOrdenada.hashCode();
+
+        return ret < 0 ? -ret : ret;
+    }
 }
+
+

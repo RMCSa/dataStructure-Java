@@ -91,7 +91,7 @@ public class HashMap<K, V> {
                 novaCapacidade = 1;
             }
             redimensionar(novaCapacidade); // Diminui o tamanho, mas não abaixo de 1
-                                                                               // capacidadeInicial
+                                           // capacidadeInicial
         }
     }
 
@@ -183,6 +183,32 @@ public class HashMap<K, V> {
         throw new Exception("Item não encontrado");
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
     public void altereUmItem(K chave, V novoValor) throws Exception {
         int indice = calcularIndice(chave);
         ListaEncadeadaSimplesDesordenada<Elemento> lista = vetor[indice];
@@ -222,6 +248,70 @@ public class HashMap<K, V> {
 
     public int getTamanho() {
         return qtdElems;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+
+        HashMap<K, V> other = (HashMap<K, V>) obj;
+
+        if (other.qtdElems != this.qtdElems || other.capacidadeInicial != this.capacidadeInicial
+                || other.txMinDesperdicio != this.txMinDesperdicio || other.txMaxDesperdicio != this.txMaxDesperdicio)
+            return false;
+
+            try{
+                for (int i = 0; i < capacidadeInicial; i++) {
+                    ListaEncadeadaSimplesDesordenada<Elemento> lista = vetor[i];
+                    ListaEncadeadaSimplesDesordenada<Elemento> otherLista = other.vetor[i];
+        
+                    if (lista == null && otherLista != null || lista != null && otherLista == null)
+                        return false;
+        
+                    if (lista != null && otherLista != null) {
+                        if (lista.getTamanho() != otherLista.getTamanho())
+                            return false;
+        
+                        for (int j = 0; j < lista.getTamanho(); j++) {
+                            if (!lista.get(j).equals(otherLista.get(j)))
+                                return false;
+                        }
+                    }
+                }
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int ret = 777;
+
+        ret += 13 * ret + qtdElems;
+        ret += 13 * ret + Integer.valueOf(capacidadeInicial).hashCode();
+        ret += 13 * ret + Float.valueOf(txMinDesperdicio).hashCode();
+        ret += 13 * ret + Float.valueOf(txMaxDesperdicio).hashCode();
+
+        try {
+            for (int i = 0; i < capacidadeInicial; i++) {
+                ListaEncadeadaSimplesDesordenada<Elemento> lista = vetor[i];
+                if (lista != null) {
+                    for (int j = 0; j < lista.getTamanho(); j++) {
+                        ret += 13 * ret + lista.get(j).hashCode();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return ret < 0 ? -ret : ret;
     }
 
     @Override
