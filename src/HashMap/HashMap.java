@@ -98,6 +98,7 @@ public class HashMap<K, V> {
         if (chave == null) {
             throw new Exception("Chave não pode ser nula");
         }
+        
 
         int indice = calcularIndice(chave);
 

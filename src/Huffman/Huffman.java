@@ -6,202 +6,255 @@ import LinkedList.Ordenadas.ListaEncadeadaSimplesOrdenada.ListaEncadeadaSimplesO
 
 public class Huffman {
     private HashMap<Character, String> codes;
-    private ListaEncadeadaSimplesOrdenada<Node> priorityQueue;
+    private ListaEncadeadaSimplesOrdenada<No> listaOrdenada;
 
-    private class Node implements Comparable<Node> {
-        private char character;
-        private int frequency;
-        private Node left, right;
+    private class No implements Comparable<No> {
+        private char charactere;
+        private int frequencia;
+        private No esq, dir;
 
         // Construtor para um nó folha
-        public Node(char character, int frequency) {
-            this.character = character;
-            this.frequency = frequency;
-            this.left = null;
-            this.right = null;
+        public No(char character, int frequencia) {
+            this.charactere = character;
+            this.frequencia = frequencia;
+            this.esq = null;
+            this.dir = null;
         }
 
         // Construtor para um nó intermediário
-        public Node(int frequency, Node left, Node right) {
-            this.character = '\0'; // Nó intermediário não tem caractere associado
-            this.frequency = frequency;
-            this.left = left;
-            this.right = right;
+        public No(int frequencia, No esq, No dir) {
+            this.charactere = '\0'; // Nó intermediário não tem caractere associado
+            this.frequencia = frequencia;
+            this.esq = esq;
+            this.dir = dir;
         }
 
+        public boolean ehFolha() {
+            return (esq == null && dir == null);
+        }
+        
+        public int getFrequencia() {
+            return frequencia;
+        }
+
+        public char getCharactere() {
+            return charactere;
+        }
+
+        public No getEsq() {
+            return esq;
+        }
+
+        public No getDir() {
+            return dir;
+        }
+
+        public void setEsq(No esq) {
+            this.esq = esq;
+        }
+
+        public void setDir(No dir) {
+            this.dir = dir;
+        }
+
+        public void setFrequencia(int frequencia) {
+            this.frequencia = frequencia;
+        }
+
+        public void setCharactere(char charactere) {
+            this.charactere = charactere;
+        }
 
         @Override
-        public int compareTo(Node other) {
-            return Integer.compare(this.frequency, other.frequency);
+        public String toString() {
+            return "[" + charactere + ", " + frequencia + "]";
         }
 
-        public boolean isLeaf() {
-            return (left == null && right == null);
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            final No other = (No) obj;
+            return this.frequencia == other.frequencia;
         }
 
-        public int getFrequency() {
-            return frequency;
+        @Override
+        public int hashCode() {
+            int ret = 777;
+
+            ret += 7 * Integer.valueOf(frequencia).hashCode();
+            ret += 7 * Character.valueOf(charactere).hashCode();
+
+            return ret < 0 ? -ret : ret;
+        }
+
+        @Override
+        public int compareTo(No other) {
+            return Integer.compare(this.frequencia, other.frequencia);
         }
     }
     // Construtor
     public Huffman() {
         this.codes = new HashMap<>(10);
-        this.priorityQueue = new ListaEncadeadaSimplesOrdenada<>();
+        this.listaOrdenada = new ListaEncadeadaSimplesOrdenada<>();
     }
 
     // Método para codificar um arquivo
-    public void encode(String inputFilePath, String outputFilePath) throws Exception {
+    public void compactar(String inputFilePath, String outputFilePath) throws Exception {
         System.out.println("Iniciando processo de codificação...");
         RandomAccessFile inputFile = new RandomAccessFile(inputFilePath, "r");
         RandomAccessFile outputFile = new RandomAccessFile(outputFilePath, "rw");
 
-        System.out.println("Passo 1: Contando frequência dos caracteres...");
-        HashMap<Character, Integer> frequencyMap = new HashMap<>(10);
+        // Passo 1: Contando frequência dos caracteres...
+        System.out.println("Contando frequência dos caracteres...");
+        HashMap<Character, Integer> frequenciaMap = new HashMap<>(10);
         int character;
         while ((character = inputFile.read()) != -1) {
             char ch = (char) character;
             try {
-                int freq = frequencyMap.recupereUmItem(ch);
-                frequencyMap.guardeUmItem(ch, freq + 1);
+                int freq = frequenciaMap.recupereUmItem(ch);
+                frequenciaMap.guardeUmItem(ch, freq + 1); // Atualizando a frequência
             } catch (Exception e) {
-                frequencyMap.guardeUmItem(ch, 1);
+                frequenciaMap.guardeUmItem(ch, 1); // Inserindo novo caractere
             }
         }
-        System.out.println("Frequências calculadas: " + frequencyMap.toString());
+        System.out.println("Frequências calculadas: " + frequenciaMap.toString());
 
         System.out.println("Passo 2: Construindo a árvore de Huffman...");
-        buildHuffmanTree(frequencyMap);
+        construitArvoreHuffman(frequenciaMap);
         System.out.println("Árvore de Huffman construída com base nas frequências!");
 
         System.out.println("Passo 3: Gerando códigos de Huffman...");
-        generateCodes(priorityQueue.getPrimeiro(), "");
+        gerarCodigos(listaOrdenada.getPrimeiro(), "");
         System.out.println("Códigos gerados: " + codes.toString());
 
         // Passo 4: Escrever a árvore de Huffman no arquivo
-        writeTree(outputFile, priorityQueue.getPrimeiro());
+        salvarArvore(outputFile, listaOrdenada.getPrimeiro());
 
         // Passo 5: Escrever o número de bits significativos
         inputFile.seek(0);
-        StringBuilder encodedData = new StringBuilder();
+        StringBuilder compactarData = new StringBuilder();
         while ((character = inputFile.read()) != -1) {
             char ch = (char) character;
-            encodedData.append(codes.recupereUmItem(ch));
+            compactarData.append(codes.recupereUmItem(ch));
         }
-        int significantBits = encodedData.length();
-        outputFile.writeInt(significantBits);
+        int bitsImportantes = compactarData.length();
+        outputFile.writeInt(bitsImportantes);
 
         // Passo 6: Escrever os dados codificados no arquivo
-        writeEncodedData(outputFile, encodedData.toString());
+        salvarDados(outputFile, compactarData.toString());
 
         inputFile.close();
         outputFile.close();
     }
     // Método para decodificar um arquivo
-    public void decode(String inputFilePath, String outputFilePath) throws Exception {
+    public void descompactar(String inputFilePath, String outputFilePath) throws Exception {
         RandomAccessFile inputFile = new RandomAccessFile(inputFilePath, "r");
         RandomAccessFile outputFile = new RandomAccessFile(outputFilePath, "rw");
 
         // Passo 1: Reconstruir a árvore de Huffman a partir do arquivo
-        Node root = readTree(inputFile);
+        No root = recuperarArvore(inputFile);
 
         // Passo 2: Ler o número de bits significativos
-        int significantBits = inputFile.readInt();
+        int bitsImportantes = inputFile.readInt();
 
         // Passo 3: Ler os dados codificados
-        StringBuilder encodedData = new StringBuilder();
+        StringBuilder compactarData = new StringBuilder();
         int character;
         while ((character = inputFile.read()) != -1) {
             String byteString = String.format("%8s", Integer.toBinaryString(character & 0xFF)).replace(' ', '0');
-            encodedData.append(byteString);
+            compactarData.append(byteString);
         }
 
         // Truncar para o número de bits significativos
-        encodedData.setLength(significantBits);
+        compactarData.setLength(bitsImportantes);
 
         // Passo 4: Decodificar os dados usando a árvore de Huffman
-        Node currentNode = root;
-        StringBuilder decodedData = new StringBuilder();
-        for (int i = 0; i < encodedData.length(); i++) {
-            currentNode = (encodedData.charAt(i) == '0') ? currentNode.left : currentNode.right;
-            if (currentNode.isLeaf()) {
-                decodedData.append(currentNode.character);
+        No currentNode = root;
+        StringBuilder descompactarData = new StringBuilder();
+        for (int i = 0; i < compactarData.length(); i++) {
+            currentNode = (compactarData.charAt(i) == '0') ? currentNode.esq : currentNode.dir;
+            if (currentNode.ehFolha()) {
+                descompactarData.append(currentNode.charactere);
                 currentNode = root;
             }
         }
 
         // Escrever os dados decodificados no arquivo de saída
-        outputFile.writeBytes(decodedData.toString());
+        outputFile.writeBytes(descompactarData.toString());
 
         inputFile.close();
         outputFile.close();
     }
 
     // Método para construir a árvore de Huffman
-    private void buildHuffmanTree(HashMap<Character, Integer> frequencyMap) throws Exception {
+    private void construitArvoreHuffman(HashMap<Character, Integer> frequenciaMap) throws Exception {
         System.out.println("Iniciando construção da árvore de Huffman...");
 
         // Criar nós para cada caractere com base na frequência
-        for (int i = 0; i < frequencyMap.getTamanho(); i++) {
-            Character character = frequencyMap.recupereUmaChave(i);
-            int frequency = frequencyMap.recupereUmItem(character);
-            System.out.println("Criando nó para caractere '" + character + "' com frequência " + frequency);
-            priorityQueue.guardeOrdenado(new Node(character, frequency));
+        for (int i = 0; i < frequenciaMap.getTamanho(); i++) {
+            Character character = frequenciaMap.recupereUmaChave(i);
+            int frequencia = frequenciaMap.recupereUmItem(character);
+            System.out.println("Criando nó para caractere '" + character + "' com frequência " + frequencia);
+            listaOrdenada.guardeOrdenado(new No(character, frequencia));
         }
 
         // Combinar nós para formar a árvore de Huffman
-        while (priorityQueue.getTamanho() > 1) {
-            Node left = priorityQueue.getPrimeiro();
-            priorityQueue.removaPrimeiro();
-            Node right = priorityQueue.getPrimeiro();
-            priorityQueue.removaPrimeiro();
+        while (listaOrdenada.getTamanho() > 1) {
+            No esq = listaOrdenada.getPrimeiro();
+            listaOrdenada.removaPrimeiro();
+            No dir = listaOrdenada.getPrimeiro();
+            listaOrdenada.removaPrimeiro();
 
-            int combinedFrequency = left.getFrequency() + right.getFrequency();
-            Node parent = new Node(combinedFrequency, left, right);
+            int combinedfrequencia = esq.getFrequencia() + dir.getFrequencia();
+            No parent = new No(combinedfrequencia, esq, dir);
 
-            System.out.println("Combinando nós: [" + left.character + ", " + left.getFrequency() + "] e [" +
-                    right.character + ", " + right.getFrequency() + "] -> Frequência combinada: " + combinedFrequency);
+            System.out.println("Combinando nós: [" + esq.charactere + ", " + esq.getFrequencia() + "] e [" +
+                    dir.charactere + ", " + dir.getFrequencia() + "] -> Frequência combinada: " + combinedfrequencia);
 
-            priorityQueue.guardeOrdenado(parent);
+            listaOrdenada.guardeOrdenado(parent);
         }
 
         System.out.println("Construção da árvore de Huffman concluída.");
     }
 
     // Método para gerar códigos de Huffman
-    private void generateCodes(Node node, String code) throws Exception {
-        if (node.isLeaf()) {
-            codes.guardeUmItem(node.character, code);
+    private void gerarCodigos(No node, String code) throws Exception {
+        if (node.ehFolha()) {
+            codes.guardeUmItem(node.charactere, code);
             return;
         }
-        generateCodes(node.left, code + "0");
-        generateCodes(node.right, code + "1");
+        gerarCodigos(node.esq, code + "0");
+        gerarCodigos(node.dir, code + "1");
     }
     // Método para escrever a árvore de Huffman no arquivo
-    private void writeTree(RandomAccessFile file, Node node) throws Exception {
-        if (node.isLeaf()) {
+    private void salvarArvore(RandomAccessFile file, No node) throws Exception {
+        if (node.ehFolha()) {
             file.writeBoolean(true); // Indica que é uma folha
-            file.writeChar(node.character); // Escreve o caractere
+            file.writeChar(node.charactere); // Escreve o caractere
             return;
         }
         file.writeBoolean(false); // Indica que é um nó intermediário
-        writeTree(file, node.left);
-        writeTree(file, node.right);
+        salvarArvore(file, node.esq);
+        salvarArvore(file, node.dir);
     }
 
     // Método para reconstruir a árvore de Huffman a partir do arquivo
-    private Node readTree(RandomAccessFile file) throws Exception {
+    private No recuperarArvore(RandomAccessFile file) throws Exception {
         if (file.readBoolean()) { // Se for uma folha
-            return new Node(file.readChar(), 0); // Retorna o nó folha com o caractere (a frequência não é relevante
+            return new No(file.readChar(), 0); // Retorna o nó folha com o caractere (a frequência não é relevante
                                                  // aqui)
         } else {
-            Node left = readTree(file); // Reconstrói a subárvore esquerda
-            Node right = readTree(file); // Reconstrói a subárvore direita
-            return new Node(0, left, right); // Cria um nó intermediário (a frequência não é usada na decodificação)
+            No esq = recuperarArvore(file); // Reconstrói a subárvore esquerda
+            No dir = recuperarArvore(file); // Reconstrói a subárvore direita
+            return new No(0, esq, dir); // Cria um nó intermediário (a frequência não é usada na decodificação)
         }
     }
 
     // Método para escrever os dados codificados no arquivo
-    private void writeEncodedData(RandomAccessFile file, String data) throws Exception {
+    private void salvarDados(RandomAccessFile file, String data) throws Exception {
         for (int i = 0; i < data.length(); i += 8) {
             String byteString = data.substring(i, Math.min(i + 8, data.length()));
             while (byteString.length() < 8) {
