@@ -182,32 +182,7 @@ public class HashMap<K, V> {
 
         throw new Exception("Item não encontrado");
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
     
     public void altereUmItem(K chave, V novoValor) throws Exception {
         int indice = calcularIndice(chave);
@@ -355,6 +330,9 @@ public class HashMap<K, V> {
 
             // Exibindo o conteúdo do HashMap
             System.out.println("Conteúdo do HashMap: " + mapa.toString());
+
+
+            HashMap<String, HashMap<String, Integer>> terminais = new HashMap<>(10);
 
         } catch (Exception e) {
             e.printStackTrace();
