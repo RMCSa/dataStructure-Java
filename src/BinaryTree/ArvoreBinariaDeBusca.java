@@ -665,6 +665,72 @@ public class ArvoreBinariaDeBusca<X extends Comparable<X>> implements Cloneable 
         return r;
     }
 
+    public boolean isEspelho(ArvoreBinariaDeBusca<X> a) {
+        return isEspelhado(raiz, a.getRaiz());
+    }
+
+    public boolean isEspelhado(No raiz1, No raiz2) {
+        if (raiz1 == null && raiz2 == null) 
+            return true;
+        
+        if (raiz1 == null || raiz2 == null) 
+            return false;
+        
+        if (!raiz1.getInfo().equals(raiz2.getInfo()))
+            return false;
+
+        return isEspelhado(raiz1.getEsq(), raiz2.getDir())
+                && isEspelhado(raiz1.getDir(), raiz2.getEsq());
+    }
+
+    public boolean isIgual(No raiz1, No raiz2) throws Exception {
+        if (raiz1 == null && raiz2 == null) {
+            return true;
+        }
+        if (raiz1 == null || raiz2 == null) {
+            return false;
+        }
+        return raiz1.getInfo().equals(raiz2.getInfo()) && isEstruturamenteIgual(raiz1.getEsq(), raiz2.getEsq())
+                && isEstruturamenteIgual(raiz1.getDir(), raiz2.getDir());
+    }
+
+    public boolean isEstruturamenteIgual(No raiz1, No raiz2) throws Exception {
+        if (raiz1 == null && raiz2 == null) {
+            return true;
+        }
+        if (raiz1 == null || raiz2 == null) {
+            return false;
+        }
+        return isEstruturamenteIgual(raiz1.getEsq(), raiz2.getEsq())
+                && isEstruturamenteIgual(raiz1.getDir(), raiz2.getDir());
+    }
+
+    /*
+     * 7) Escreva uma função para printar uma árvore em notação de "cebola", ou
+     * seja, o encaixamento das informações da árvore seria dado pela
+     * parentetização dos elementos, por exemplo: (((10)25(40))50((60)75(95))),
+     * onde 50 seria raiz, 25 seria a raiz da subárvore esquerda de 50, 75 seria
+     * a raiz da subárvore direita de 50, 10 seria a raiz da subárvore esquerda
+     * de 25, 40 seria a raiz da subárvore direita de 25, 60 seria a raiz da
+     * subárvore esquerda de 75, 95 seria a raiz da subárvore direita de 75.
+     * Ainda, 10, 40, 60 e 95 não teriam subárvores nem esquerda e nem direita,
+     * já que estão sozinhos dentro de um par de parênteses.
+     */
+
+     public void notacaoDeCebola(){
+        printarNotacaoCebola(raiz);
+     }
+
+     public void printarNotacaoCebola(No raiz) {
+        if (raiz == null) {
+            return;
+        }
+        System.out.print("(");
+        System.out.print(raiz.getInfo());
+        printarNotacaoCebola(raiz.getEsq());
+        printarNotacaoCebola(raiz.getDir());
+        System.out.print(")");
+     }
     // 12. Contar Nodos Internos
 
     public int contarNodosInternos() {
@@ -752,10 +818,30 @@ public class ArvoreBinariaDeBusca<X extends Comparable<X>> implements Cloneable 
         arvore.inclua(7);
         arvore.inclua(13);
         arvore.inclua(20);
-        System.out.println("Em Ordem:");
-        arvore.emOrdem(arvore.getRaiz());
-        System.out.println("separador");
-        arvore.emOrdem(arvore.getRaiz().getEsq());
+
+        ArvoreBinariaDeBusca<Integer> arvore2 = new ArvoreBinariaDeBusca<>();
+        arvore2.inclua(10);
+        arvore2.inclua(8);
+        arvore2.inclua(18);
+        arvore2.inclua(5);
+        arvore2.inclua(9);
+        arvore2.inclua(7);
+        arvore2.inclua(13);
+        arvore2.inclua(20);
+        System.out.println("");
+        arvore.notacaoDeCebola();
+        System.out.println("");
+        /*
+        System.out.println(arvore.isEstruturamenteIgual(arvore.getRaiz(), arvore2.getRaiz()));
+         * System.out.println("Em Ordem:");
+         * arvore.emOrdem(arvore.getRaiz());
+         * System.out.println("Pre Ordem:");
+         * arvore.preOrdem(arvore.getRaiz());
+         * System.out.println("Pos Ordem:");
+         * arvore.posOrdem(arvore.getRaiz());
+         * System.out.println("separador");
+         * arvore.emOrdem(arvore.getRaiz().getEsq());
+         */
     }
 
 }
